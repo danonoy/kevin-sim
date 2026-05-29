@@ -72,7 +72,7 @@
 
         let currentStage = 0;
 
-        // Strictly Non-Insurance Scenarios
+        // Scenarios
         const storyEvents = [
             {
                 // Scenario 1: The Car
@@ -141,7 +141,7 @@
                 ]
             },
             {
-                // Scenario 3: Credit Card & BNPL Trap (Lifestyle Creep)
+                // Scenario 3: BNPL Trap
                 setup: [
                     "So, I found this gorgeous designer watch. It's normally $4,500.",
                     "But the store has this zero-interest Buy Now Pay Later plan. It's literally only $125 a month!",
@@ -183,12 +183,8 @@
         ];
 
         function scrollToBottom() {
-            // Smoothly scrolls to ensure the latest bubble is completely visible
             setTimeout(() => {
-                chatBox.scrollTo({
-                    top: chatBox.scrollHeight,
-                    behavior: 'smooth'
-                });
+                chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
             }, 50);
         }
 
@@ -256,7 +252,7 @@
             });
             
             choicePanel.classList.remove('hidden');
-            scrollToBottom(); // Push window up naturally when options pop up
+            scrollToBottom(); 
         }
 
         function handleChoice(choice, event) {
@@ -371,17 +367,12 @@
             choicePanel.classList.add('hidden');
             choicesContainer.innerHTML = '';
 
-            gtag('event', 'game_complete', {
-                'event_category': 'Completion',
-                'final_debt': stats.debt,
-                'final_stress': stats.stress,
-                'final_trust': stats.trust
-            });
-
-            let ending = '';
+            let endingTypeString = '';
+            let endingHtml = '';
 
             if (stats.debt > 40000 || stats.stress > 75) {
-                ending = `
+                endingTypeString = 'Crashed';
+                endingHtml = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">💀</div>
                         <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin Crashed.</div>
@@ -391,7 +382,8 @@
                     </div>
                 `;
             } else if (stats.trust > 60) {
-                ending = `
+                endingTypeString = 'Saved';
+                endingHtml = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">🛟</div>
                         <div class="text-2xl font-black text-gray-800 tracking-tight">You Saved Him.</div>
@@ -401,7 +393,8 @@
                     </div>
                 `;
             } else {
-                ending = `
+                endingTypeString = 'Surviving';
+                endingHtml = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">😶</div>
                         <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin is Surviving.</div>
@@ -412,13 +405,21 @@
                 `;
             }
 
+            gtag('event', 'game_complete', {
+                'event_category': 'Completion',
+                'ending_type': endingTypeString,
+                'final_debt': stats.debt,
+                'final_stress': stats.stress,
+                'final_trust': stats.trust
+            });
+
             const result = document.createElement('div');
             result.className = 'bg-white rounded-3xl p-6 slide-up shadow-xl mt-4 mb-6 border border-gray-100 mx-2 relative z-40';
             
             const formattedDebt = new Intl.NumberFormat('en-US').format(stats.debt);
 
             result.innerHTML = `
-                ${ending}
+                ${endingHtml}
                 <div class="mt-8 bg-gray-50 rounded-2xl p-4 text-[13px] space-y-3 font-medium text-gray-600 border border-gray-100">
                     <div class="flex justify-between items-center">
                         <span>💸 Final Debt</span>
