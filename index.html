@@ -1,437 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kevin Life Simulator Beta</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kevin Life Simulator Beta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+      // 初始化 GA4
+      gtag('config', 'G-TBP17V9M20');
+    </script>
 
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag(){
-      dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-    gtag('config', 'G-TBP17V9M20');
-  </script>
-
-  <style>
-    body{
-      font-family: Arial, sans-serif;
-      background:#d1d5db;
-    }
-
-    .bubble{
-      padding:12px 16px;
-      border-radius:18px;
-      max-width:80%;
-      margin-bottom:12px;
-      line-height:1.5;
-      animation:fade .25s ease;
-    }
-
-    .kevin{
-      background:#f3f4f6;
-      color:#111827;
-      align-self:flex-start;
-    }
-
-    .user{
-      background:#2563eb;
-      color:white;
-      align-self:flex-end;
-    }
-
-    @keyframes fade{
-      from{
-        opacity:0;
-        transform:translateY(6px);
-      }
-      to{
-        opacity:1;
-        transform:translateY(0);
-      }
-    }
-  </style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #111827; }
+        ::-webkit-scrollbar { display: none; }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .slide-up { animation: slideUp 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-bubble-k { background-color: #f3f4f6; color: #1f2937; border-bottom-left-radius: 4px; }
+        .chat-bubble-u { background-color: #3b82f6; color: #ffffff; border-bottom-right-radius: 4px; }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
 </head>
+<body class="flex items-center justify-center min-h-screen py-4 sm:py-8">
 
-<body class="flex items-center justify-center min-h-screen p-4">
-
-  <div class="w-full max-w-md h-[820px] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-
-    <!-- Header -->
-    <div class="bg-gray-100 border-b p-4">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xl">
-          K
+    <div class="w-full max-w-sm h-[800px] max-h-screen bg-white shadow-2xl relative flex flex-col sm:rounded-[2.5rem] border-[8px] border-gray-900 overflow-hidden">
+        
+        <div class="bg-gray-100/90 backdrop-blur-sm border-b border-gray-200 px-4 py-3 flex items-center gap-3 z-10 sticky top-0">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-700 to-gray-900 flex items-center justify-center text-white font-bold text-lg shadow-inner">K</div>
+            <div>
+                <h2 class="font-bold text-gray-800 leading-tight">Kevin</h2>
+                <p class="text-xs text-green-600 font-bold">Online</p>
+            </div>
         </div>
 
-        <div>
-          <h1 class="font-bold text-gray-800">
-            Kevin (25)
-          </h1>
+        <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4 pb-32 bg-slate-50">
+            </div>
 
-          <p class="text-sm text-gray-500">
-            Salary: $4,200 / Savings: $3,000
-          </p>
+        <div id="time-jump" class="absolute inset-0 bg-slate-900/95 z-20 flex flex-col items-center justify-center hidden fade-in text-white">
+            <p class="text-gray-400 text-sm mb-2" id="jump-subtitle">3 Months Later...</p>
+            <h2 class="text-2xl font-black tracking-widest text-center px-4" id="jump-title">Life is Good</h2>
         </div>
-      </div>
+
+        <div id="choice-panel" class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-200 p-2 hidden slide-up shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] z-30">
+            <p class="text-[10px] font-bold text-gray-400 text-center uppercase tracking-widest mt-1">Give Advice</p>
+            <div id="choices-container" class="space-y-2 max-h-[40vh] overflow-y-auto pb-2 px-2 mt-2">
+                </div>
+        </div>
+
     </div>
 
-    <!-- Chat -->
-    <div
-      id="chat"
-      class="flex-1 overflow-y-auto p-4 flex flex-col"
-    ></div>
-
-    <!-- Status -->
-    <div class="border-t bg-gray-50 p-3 text-sm">
-      <div class="flex justify-between mb-1">
-        <span>Debt</span>
-        <span id="debtText">$0</span>
-      </div>
-
-      <div class="flex justify-between">
-        <span>Stress</span>
-        <span id="stressText">0%</span>
-      </div>
-    </div>
-
-    <!-- Choices -->
-    <div
-      id="choicesDiv"
-      class="p-3 border-t bg-white space-y-2"
-    ></div>
-
-  </div>
-
-<script>
-
-const chat = document.getElementById("chat");
-const choicesDiv = document.getElementById("choicesDiv");
-const debtText = document.getElementById("debtText");
-const stressText = document.getElementById("stressText");
-
-let debt = 0;
-let stress = 0;
-let currentEvent = 0;
-
-const story = [
-
-  // EVENT 1
-  {
-    title: "Tesla Loan",
-
-    message:
-      "Bro... I really wanna buy a Model Y before the reunion. Everyone else upgraded already 😭. The dealer approved me for an 84-month loan. Monthly payment is only $640. I think I can handle it.",
-
-    choices: [
-      {
-        text: "You absolutely cannot afford this car.",
-        reply:
-          "Come on man... I'm still young. I don't wanna look broke forever 😩",
-        debt: 18000,
-        stress: 15
-      },
-
-      {
-        text: "At least save a down payment first.",
-        reply:
-          "That'll take forever though 😭 I already signed the papers...",
-        debt: 14000,
-        stress: 10
-      },
-
-      {
-        text: "Do it. Life is short.",
-        reply:
-          "LET'S GOOOO 😎 I even upgraded the wheels too.",
-        debt: 25000,
-        stress: 20
-      }
-    ]
-  },
-
-  // EVENT 2
-  {
-    title: "Crypto Disaster",
-
-    message:
-      "My friend says this crypto coin is gonna 10x soon 🚀. I'm thinking about putting my entire emergency fund into it.",
-
-    choices: [
-      {
-        text: "Never gamble your emergency fund.",
-        reply:
-          "You're too conservative 😒 scared money never wins.",
-        debt: 6000,
-        stress: 20
-      },
-
-      {
-        text: "Only invest money you can lose.",
-        reply:
-          "If I only put in a little, I won't get rich though 😭",
-        debt: 9000,
-        stress: 25
-      },
-
-      {
-        text: "Go all in.",
-        reply:
-          "BRO THIS IS OUR CHANCE 🔥🔥🔥",
-        debt: 18000,
-        stress: 35
-      }
-    ]
-  },
-
-  // EVENT 3
-  {
-    title: "Buy Now Pay Later",
-
-    message:
-      "I found this luxury watch online. It's only $79/month with installments. That's basically free, right? 👀",
-
-    choices: [
-      {
-        text: "Monthly payments add up fast.",
-        reply:
-          "But it's ONLY 79 bucks 😭",
-        debt: 4000,
-        stress: 10
-      },
-
-      {
-        text: "You don't need this watch.",
-        reply:
-          "You don't understand the vibe 😩",
-        debt: 7000,
-        stress: 15
-      },
-
-      {
-        text: "Treat yourself king.",
-        reply:
-          "FINALLY someone gets it 😎",
-        debt: 12000,
-        stress: 20
-      }
-    ]
-  },
-
-  // NEW EVENT 4
-  {
-    title: "Friend's Startup",
-
-    message:
-      "My friend wants me to invest $5,000 into his new business. He says if I don't support him, I'm not a real friend 😓",
-
-    choices: [
-      {
-        text: "Never invest under emotional pressure.",
-        reply:
-          "Yeah but I feel guilty saying no 😭",
-        debt: 5000,
-        stress: 15
-      },
-
-      {
-        text: "Ask to see financial projections first.",
-        reply:
-          "That feels awkward though...",
-        debt: 3000,
-        stress: 10
-      },
-
-      {
-        text: "Support your friend. Go for it.",
-        reply:
-          "I knew you'd understand 🥺",
-        debt: 15000,
-        stress: 25
-      }
-    ]
-  }
-
-];
-
-function scrollBottom(){
-  chat.scrollTop = chat.scrollHeight;
-}
-
-function addKevinMessage(text){
-
-  chat.innerHTML += `
-    <div class="bubble kevin">
-      ${text}
-    </div>
-  `;
-
-  scrollBottom();
-}
-
-function addUserMessage(text){
-
-  chat.innerHTML += `
-    <div class="bubble user">
-      ${text}
-    </div>
-  `;
-
-  scrollBottom();
-}
-
-function updateStats(){
-
-  debtText.innerText = `$${debt.toLocaleString()}`;
-  stressText.innerText = `${stress}%`;
-
-}
-
-function nextEvent(){
-
-  if(currentEvent >= story.length){
-    endGame();
-    return;
-  }
-
-  const event = story[currentEvent];
-
-  // GA4 EVENT VIEW
-  gtag('event', 'event_view', {
-    event_name: event.title
-  });
-
-  addKevinMessage(event.message);
-
-  choicesDiv.innerHTML = "";
-
-  event.choices.forEach(choice => {
-
-    const btn = document.createElement("button");
-
-    btn.className =
-      "w-full bg-gray-100 hover:bg-blue-100 transition p-3 rounded-xl text-left";
-
-    btn.innerText = choice.text;
-
-    btn.onclick = () => {
-
-      // GA4 CHOICE SELECTED
-      gtag('event', 'choice_selected', {
-        event_name: event.title,
-        choice: choice.text
-      });
-
-      addUserMessage(choice.text);
-
-      setTimeout(() => {
-
-        addKevinMessage(choice.reply);
-
-        debt += choice.debt;
-        stress += choice.stress;
-
-        updateStats();
-
-        currentEvent++;
-
-        choicesDiv.innerHTML = "";
-
-        setTimeout(() => {
-          nextEvent();
-        }, 1800);
-
-      }, 900);
-
-    };
-
-    choicesDiv.appendChild(btn);
-
-  });
-
-}
-
-function endGame(){
-
-  // GA4 ENDING REACHED
-  gtag('event', 'ending_reached', {
-    debt: debt,
-    stress: stress
-  });
-
-  let ending = "";
-
-  if(debt >= 45000){
-
-    ending =
-      "Kevin is drowning in debt. Collection agencies are calling daily. His financial life is collapsing.";
-
-  } else if(stress >= 70){
-
-    ending =
-      "Kevin developed severe anxiety from financial pressure. He can barely sleep anymore.";
-
-  } else {
-
-    ending =
-      "Kevin barely survived adulthood... but his financial future still looks unstable.";
-
-  }
-
-  chat.innerHTML += `
-    <div class="bubble kevin">
-      ${ending}
-    </div>
-  `;
-
-  choicesDiv.innerHTML = `
-    <button
-      onclick="restartGame()"
-      class="w-full bg-black text-white p-4 rounded-xl font-bold"
-    >
-      🔄 Try To Save Kevin Again
-    </button>
-  `;
-
-  scrollBottom();
-
-}
-
-function restartGame(){
-
-  // GA4 REPLAY CLICKED
-  gtag('event', 'replay_clicked');
-
-  location.reload();
-
-}
-
-function startGame(){
-
-  // GA4 GAME START
-  gtag('event', 'game_start');
-
-  addKevinMessage(
-    "Hey... I think my life might be getting out of control lately 😅"
-  );
-
-  setTimeout(() => {
-    nextEvent();
-  }, 1200);
-
-}
-
-startGame();
-
-</script>
-
-</body>
-</html>
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const choicePanel = document.getElementById('choice-panel');
+        const choicesContainer = document.getElementById('choices-container');
+        const timeJump = document.getElementById('time-jump');
+        
+        // Hidden Stats
+        let stats = {
+            trust: 50,    
+            stress: 50,   
+            debt: 0       
+        };
+
+        let currentStage = 0;
+
+        // Scenarios Library (3 Scenarios now)
+        const storyEvents = [
+            {
+                // Scenario 1: The Car (Status Anxiety)
+                setup: [
+                    "Work is stressing me out so much lately. My boss is a nightmare.",
+                    "Went to a college reunion yesterday. Everyone's doing so well. Jack literally pulled up in a Porsche.",
+                    "I know I just started my career, but I feel like such a loser at these things...",
+                    "I'm thinking of financing a Model Y. 84-month loan, 0 down. It's only like $600/mo. I think I can squeeze it into my budget."
+                ],
+                choices: [
+                    {
+                        text: "Are you insane? You make $4,200/mo. The loan + insurance will drown you. Keep driving your old car!",
+                        trustEffect: -20, stressEffect: 30, debtEffect: 85000,
+                        reply: "You always just lecture me. You don't understand what it feels like to be looked down on. Whatever, I already signed the papers.",
+                        jumpTitle: "Feeling Like a Boss", jumpSub: "2 Months Later",
+                        consequence: "Got the car. Money is super tight by the end of the month, but taking girls out in it feels amazing. Worth it."
+                    },
+                    {
+                        text: "I get wanting to prove yourself, but 100% financing is a trap. Save 20% for a down payment first?",
+                        trustEffect: 15, stressEffect: -10, debtEffect: 15000,
+                        reply: "Saving 20% would take forever... But you're right, it's too tight. I backed out and got a used Golf instead.",
+                        jumpTitle: "A Modest Compromise", jumpSub: "2 Months Later",
+                        consequence: "The used car is fine. Not as flashy, but it gets me around and I'm not stressing over the payments."
+                    },
+                    {
+                        text: "You only live once! Do it. You gotta look the part to get the part. Make them jealous!",
+                        trustEffect: 20, stressEffect: 10, debtEffect: 90000,
+                        reply: "Haha I knew you'd get it! I even put a stereo upgrade on my credit card. It's sick! 😎",
+                        jumpTitle: "Peak Euphoria", jumpSub: "2 Months Later",
+                        consequence: "The new ride is incredible! Jack was speechless. Finally feel like I'm doing something with my life."
+                    }
+                ]
+            },
+            {
+                // Scenario 2: Crypto FOMO (Greed)
+                setup: [
+                    "Hey, gotta tell you something.",
+                    "Jack tipped me off on this new crypto coin. It literally tripled in a month.",
+                    "I'm thinking of taking my $3,000 emergency fund and going ALL IN. In and out in a month. Free money."
+                ],
+                choices: [
+                    {
+                        text: "That's your safety net! Don't touch it. 9 out of 10 of those are pump-and-dump scams.",
+                        trustEffect: 0, 
+                        getReply: () => {
+                            if (stats.trust >= 60) {
+                                stats.stress -= 10;
+                                return "Ugh... fine. Since you're usually right about this stuff, I'll pass. I'll just watch them get rich.";
+                            } else {
+                                stats.debt += 10000;
+                                stats.stress += 40;
+                                return "You're too scared of everything, that's why you're stuck in the rat race. I'm not missing this. I went all in and put some on a credit card.";
+                            }
+                        },
+                        jumpTitle: "The Gears of Fate", jumpSub: "6 Months Later"
+                    },
+                    {
+                        text: "If you really have FOMO, just put in $500. DO NOT touch the rest of your savings.",
+                        trustEffect: 10,
+                        getReply: () => {
+                            stats.stress += 10;
+                            return "Fair enough. Let's meet in the middle. I'll just put in a little to test the waters.";
+                        },
+                        jumpTitle: "The Gears of Fate", jumpSub: "6 Months Later"
+                    }
+                ]
+            },
+            {
+                // Scenario 3: The Insurance Trap (Risk Illusion) - NEW!
+                setup: [
+                    "So, the guys are booking a massive ski trip to Japan for winter.",
+                    "I don't really have the cash right now...",
+                    "BUT, I realized if I cancel my premium health insurance, I can use that money to pay for the trip installments!",
+                    "I'm 25 and perfectly healthy. It's basically throwing money away every month anyway, right?"
+                ],
+                choices: [
+                    {
+                        text: "Absolutely not. You cannot go uninsured. One medical emergency will bankrupt you.",
+                        trustEffect: -10, stressEffect: 10,
+                        getReply: () => {
+                            if (stats.trust >= 50) {
+                                return "Geez, okay fine. I'll keep the insurance and just tell the guys I can't go. Sucks though. 😔";
+                            } else {
+                                stats.debt += 45000; 
+                                stats.stress += 50;
+                                return "You sound like a boomer. I'm not wasting my youth worrying about 'what ifs'. I canceled it. Tokyo here I come!";
+                            }
+                        },
+                        jumpTitle: "The Wake Up Call", jumpSub: "4 Months Later"
+                    },
+                    {
+                        text: "How about downgrading to a basic catastrophic plan? It's cheaper, covers disasters, and you can maybe do a cheaper local trip?",
+                        trustEffect: 15, stressEffect: -5, debtEffect: 5000,
+                        getReply: () => {
+                            return "Okay, that's a smart middle ground. I'll downgrade and we'll just do a road trip instead of Japan.";
+                        },
+                        jumpTitle: "The Wake Up Call", jumpSub: "4 Months Later"
+                    },
+                    {
+                        text: "Cancel it! You're young and healthy. Enjoy your 20s while you can, worry about insurance later.",
+                        trustEffect: 20, stressEffect: 0, debtEffect: 65000,
+                        getReply: () => {
+                            return "Exactly! Why pay for something I never use? Flights to Tokyo are booked! 🏂🎌";
+                        },
+                        jumpTitle: "The Wake Up Call", jumpSub: "4 Months Later"
+                    }
+                ]
+            }
+        ];
+
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function showTyping(callback) {
+            const id = 'typing-' + Date.now();
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div id="${id}" class="flex gap-2 w-max max-w-[75%] px-4 py-3 rounded-2xl chat-bubble-k slide-up items-center">
+                    <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
+                </div>
+            `);
+            scrollToBottom();
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if(el) el.remove();
+                callback();
+            }, 1800);
+        }
+
+        function addKevinMessage(text) {
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div class="flex gap-2 w-max max-w-[85%] px-4 py-3 rounded-2xl chat-bubble-k slide-up text-[15px] leading-relaxed shadow-sm">
+                    ${text}
+                </div>
+            `);
+            scrollToBottom();
+        }
+
+        function addUserMessage(text) {
+            chatBox.insertAdjacentHTML('beforeend', `
+                <div class="flex gap-2 w-max max-w-[85%] px-4 py-3 rounded-2xl chat-bubble-u slide-up text-[15px] leading-relaxed shadow-sm self-end">
+                    ${text}
+                </div>
+            `);
+            scrollToBottom();
+        }
+
+        function sendMessageSequence(messages, callback) {
+            let i = 0;
+            function sendNext() {
+                if (i < messages.length) {
+                    showTyping(() => {
+                        addKevinMessage(messages[i]);
+                        i++;
+                        setTimeout(sendNext, 1200); // Slightly slower for better reading pace
+                    });
+                } else {
+                    if (callback) callback();
+                }
+            }
+            sendNext();
+        }
+
+        function promptChoices(stage) {
+            choicesContainer.innerHTML = '';
+            const event = storyEvents[stage];
+            
+            event.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-3.5 px-4 rounded-xl border border-gray-200 text-left text-[14px] leading-snug transition shadow-sm';
+                btn.innerText = choice.text;
+                btn.onclick = () => handleChoice(choice, event);
+                choicesContainer.appendChild(btn);
+            });
+            
+            choicePanel.classList.remove('hidden');
+        }
+
+        function handleChoice(choice, event) {
+            choicePanel.classList.add('hidden');
+            addUserMessage(choice.text);
+            
+            // [GA4 Tracking Event 3] - choice_made
+            gtag('event', 'choice_made', {
+                'event_category': 'Decision',
+                'stage': currentStage + 1,
+                'choice_text': choice.text
+            });
+            
+            if(choice.trustEffect) stats.trust += choice.trustEffect;
+            if(choice.stressEffect) stats.stress += choice.stressEffect;
+            if(choice.debtEffect) stats.debt += choice.debtEffect;
+
+            const finalReply = choice.getReply ? choice.getReply() : choice.reply;
+
+            setTimeout(() => {
+                showTyping(() => {
+                    addKevinMessage(finalReply);
+                    
+                    setTimeout(() => {
+                        triggerTimeJump(choice.jumpTitle, choice.jumpSub, choice.consequence);
+                    }, 2500);
+                });
+            }, 800);
+        }
+
+        function triggerTimeJump(title, subtitle, consequence) {
+            document.getElementById('jump-title').innerText = title;
+            document.getElementById('jump-subtitle').innerText = subtitle;
+            timeJump.classList.remove('hidden');
+            
+            setTimeout(() => {
+                timeJump.classList.add('hidden');
+                
+                setTimeout(() => {
+                    if(consequence) {
+                        showTyping(() => {
+                            addKevinMessage(consequence);
+                            setTimeout(() => {
+                                currentStage++;
+                                if(currentStage < storyEvents.length) {
+                                    runStage();
+                                } else {
+                                    triggerEndingDialogue();
+                                }
+                            }, 3500);
+                        });
+                    } else {
+                        currentStage++;
+                        if(currentStage < storyEvents.length) {
+                            runStage();
+                        } else {
+                            triggerEndingDialogue();
+                        }
+                    }
+                }, 1000);
+            }, 3000);
+        }
+
+        function runStage() {
+            // [GA4 Tracking Event 2] - scenario_reached
+            gtag('event', 'scenario_reached', {
+                'event_category': 'Progress',
+                'stage_number': currentStage + 1
+            });
+
+            setTimeout(() => {
+                sendMessageSequence(storyEvents[currentStage].setup, () => {
+                    setTimeout(() => promptChoices(currentStage), 500);
+                });
+            }, 1000);
+        }
+
+        // 終局對話鋪墊 (新增醫療危機後果)
+        function triggerEndingDialogue() {
+            setTimeout(() => {
+                let endingMsg = [];
+                if (stats.debt > 40000) {
+                    endingMsg = [
+                        "Hey man, are you there?",
+                        "I'm completely screwed...",
+                        "My appendix burst out of nowhere. Emergency surgery.",
+                        "Because of all the other stuff, I had no safety net. The hospital bills are insane.",
+                        "Collections won't stop calling. They're going to repo the car..."
+                    ];
+                } else if (stats.stress > 60) {
+                    endingMsg = [
+                        "Hey...",
+                        "I had a medical scare last week. Appendicitis.",
+                        "The basic insurance covered some of it, but the out-of-pocket still wiped out everything I had.",
+                        "I'm barely keeping my head above water right now. It's so stressful."
+                    ];
+                } else {
+                    endingMsg = [
+                        "Hey!",
+                        "Crazy month. My appendix burst and I had to get emergency surgery.",
+                        "It sucked, but thank God I kept that insurance plan and had some savings left.",
+                        "Could've been a total disaster, but I'm surviving."
+                    ];
+                }
+
+                sendMessageSequence(endingMsg, () => {
+                    setTimeout(() => {
+                        endGame();
+                    }, 2000);
+                });
+            }, 2000);
+        }
+
+        // 結算畫面
+        function endGame() {
+            choicePanel.classList.add('hidden');
+            choicesContainer.innerHTML = '';
+
+            // [GA4 Tracking Event 4] - game_complete
+            gtag('event', 'game_complete', {
+                'event_category': 'Completion',
+                'final_debt': stats.debt,
+                'final_stress': stats.stress,
+                'final_trust': stats.trust
+            });
+
+            let ending = '';
+
+            if (stats.debt > 50000 || stats.stress > 80) {
+                ending = `
+                    <div class="text-center space-y-4">
+                        <div class="text-6xl mb-4">💀</div>
+                        <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin Crashed.</div>
+                        <div class="text-gray-500 text-sm leading-relaxed">
+                            He lost his cash flow.<br>He has zero risk tolerance left.<br>And he's ghosting everyone's texts.
+                        </div>
+                    </div>
+                `;
+            } else if (stats.trust > 60) {
+                ending = `
+                    <div class="text-center space-y-4">
+                        <div class="text-6xl mb-4">🛟</div>
+                        <div class="text-2xl font-black text-gray-800 tracking-tight">You Almost Saved Him.</div>
+                        <div class="text-gray-500 text-sm leading-relaxed">
+                            Kevin is still impulsive.<br>But he's starting to ask you for advice before doing something stupid.
+                        </div>
+                    </div>
+                `;
+            } else {
+                ending = `
+                    <div class="text-center space-y-4">
+                        <div class="text-6xl mb-4">😶</div>
+                        <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin is Struggling.</div>
+                        <div class="text-gray-500 text-sm leading-relaxed">
+                            His life isn't completely ruined.<br>But he hasn't really grown up yet either.
+                        </div>
+                    </div>
+                `;
+            }
+
+            const result = document.createElement('div');
+            result.className = 'bg-white rounded-3xl p-6 slide-up shadow-xl mt-4 mb-6 border border-gray-100 mx-2 relative z-40';
+            
+            const formattedDebt = new Intl.NumberFormat('en-US').format(stats.debt);
+
+            result.innerHTML = `
+                ${ending}
+                <div class="mt-8 bg-gray-50 rounded-2xl p-4 text-[13px] space-y-3 font-medium text-gray-600 border border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <span>💸 Final Debt</span>
+                        <span class="text-red-500 font-bold text-base">$${formattedDebt}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>😵 Stress Level</span>
+                        <span class="text-gray-800 font-bold">${stats.stress}/100</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span>🤝 Trust in You</span>
+                        <span class="text-blue-600
