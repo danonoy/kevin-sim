@@ -1,477 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kevin Life Simulator Beta</title>
 
-  gtag('config', 'G-TBP17V9M20');
-</script>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
 
-<title>Kevin Life Sim Beta</title>
+    function gtag(){
+      dataLayer.push(arguments);
+    }
 
-<script src="https://cdn.tailwindcss.com"></script>
+    gtag('js', new Date());
+    gtag('config', 'G-TBP17V9M20');
+  </script>
 
-<style>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#d1d5db;
+    }
 
-body{
-    font-family: Arial, sans-serif;
-    background:#dfe4ea;
-}
+    .bubble{
+      padding:12px 16px;
+      border-radius:18px;
+      max-width:80%;
+      margin-bottom:12px;
+      line-height:1.5;
+      animation:fade .25s ease;
+    }
 
-.chat-scroll::-webkit-scrollbar{
-    display:none;
-}
+    .kevin{
+      background:#f3f4f6;
+      color:#111827;
+      align-self:flex-start;
+    }
 
-.fade{
-    animation:fade .3s ease;
-}
+    .user{
+      background:#2563eb;
+      color:white;
+      align-self:flex-end;
+    }
 
-@keyframes fade{
-    from{
+    @keyframes fade{
+      from{
         opacity:0;
-        transform:translateY(10px);
-    }
-    to{
+        transform:translateY(6px);
+      }
+      to{
         opacity:1;
-        transform:translateY(0px);
+        transform:translateY(0);
+      }
     }
-}
-
-.typing span{
-    width:8px;
-    height:8px;
-    background:#999;
-    border-radius:999px;
-    display:inline-block;
-    animation:bounce 1.2s infinite;
-}
-
-.typing span:nth-child(2){
-    animation-delay:.2s;
-}
-
-.typing span:nth-child(3){
-    animation-delay:.4s;
-}
-
-@keyframes bounce{
-    0%,80%,100%{
-        transform:scale(.5);
-        opacity:.5;
-    }
-
-    40%{
-        transform:scale(1);
-        opacity:1;
-    }
-}
-
-</style>
+  </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="flex items-center justify-center min-h-screen p-4">
 
-<div class="w-full max-w-md h-[90vh] bg-white rounded-[32px] overflow-hidden shadow-2xl border-8 border-black flex flex-col">
+  <div class="w-full max-w-md h-[820px] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col">
 
-    <!-- header -->
-    <div class="bg-white border-b p-4 flex justify-between items-center">
-
-        <div class="flex items-center gap-3">
-
-            <div id="avatar"
-                class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xl">
-                K
-            </div>
-
-            <div>
-                <div class="font-bold">
-                    Kevin (25)
-                </div>
-
-                <div class="text-xs text-gray-500">
-                    Salary $4,200 ・ Savings $3,000
-                </div>
-            </div>
-
+    <!-- Header -->
+    <div class="bg-gray-100 border-b p-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xl">
+          K
         </div>
 
-        <div class="text-right text-xs">
-            <div>Replay</div>
-            <div id="replayCount" class="font-black text-lg">0</div>
-        </div>
+        <div>
+          <h1 class="font-bold text-gray-800">
+            Kevin (25)
+          </h1>
 
+          <p class="text-sm text-gray-500">
+            Salary: $4,200 / Savings: $3,000
+          </p>
+        </div>
+      </div>
     </div>
 
-    <!-- stats -->
-    <div class="bg-gray-100 p-2 flex gap-2 text-xs border-b">
+    <!-- Chat -->
+    <div
+      id="chat"
+      class="flex-1 overflow-y-auto p-4 flex flex-col"
+    ></div>
 
-        <div class="bg-white px-3 py-1 rounded-full shadow">
-            💸 Debt: <span id="debtText">0</span>
-        </div>
+    <!-- Status -->
+    <div class="border-t bg-gray-50 p-3 text-sm">
+      <div class="flex justify-between mb-1">
+        <span>Debt</span>
+        <span id="debtText">$0</span>
+      </div>
 
-        <div class="bg-white px-3 py-1 rounded-full shadow">
-            😵 Stress: <span id="stressText">0</span>
-        </div>
-
-        <div class="bg-white px-3 py-1 rounded-full shadow">
-            🤝 Trust: <span id="trustText">50</span>
-        </div>
-
+      <div class="flex justify-between">
+        <span>Stress</span>
+        <span id="stressText">0%</span>
+      </div>
     </div>
 
-    <!-- chat -->
-    <div id="chat"
-        class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#f7f7f7] chat-scroll">
-    </div>
+    <!-- Choices -->
+    <div
+      id="choicesDiv"
+      class="p-3 border-t bg-white space-y-2"
+    ></div>
 
-    <!-- choices -->
-    <div id="choices"
-        class="border-t bg-white p-3 flex flex-col gap-2">
-    </div>
-
-</div>
+  </div>
 
 <script>
 
-const chat = document.getElementById('chat')
-const choices = document.getElementById('choices')
+const chat = document.getElementById("chat");
+const choicesDiv = document.getElementById("choicesDiv");
+const debtText = document.getElementById("debtText");
+const stressText = document.getElementById("stressText");
 
-const debtText = document.getElementById('debtText')
-const stressText = document.getElementById('stressText')
-const trustText = document.getElementById('trustText')
+let debt = 0;
+let stress = 0;
+let currentEvent = 0;
 
-let debt = 0
-let stress = 0
-let trust = 50
+const story = [
 
-let currentStage = 0
+  // EVENT 1
+  {
+    title: "Tesla Loan",
 
-// replay count
-let replay = parseInt(localStorage.getItem('kevinReplay') || '0')
-replay++
-
-localStorage.setItem('kevinReplay', replay)
-
-document.getElementById('replayCount').innerText = replay
-
-// events
-const events = [
-
-{
     message:
-    'Bro... I seriously can’t keep driving this crappy car 😩 I wanna finance a Model Y.',
+      "Bro... I really wanna buy a Model Y before the reunion. Everyone else upgraded already 😭. The dealer approved me for an 84-month loan. Monthly payment is only $640. I think I can handle it.",
 
-    choices:[
-        {
-            text:'You literally cannot afford it.',
-            rebel:true,
-            reply:'Yeah but I’m tired of looking broke... I signed the papers anyway.',
-            debt:35000,
-            stress:20,
-            trust:5
-        },
+    choices: [
+      {
+        text: "You absolutely cannot afford this car.",
+        reply:
+          "Come on man... I'm still young. I don't wanna look broke forever 😩",
+        debt: 18000,
+        stress: 15
+      },
 
-        {
-            text:'At least save up a down payment first.',
-            rebel:false,
-            reply:'Ugh... fine. I’ll wait a bit.',
-            debt:5000,
-            stress:5,
-            trust:10
-        },
+      {
+        text: "At least save a down payment first.",
+        reply:
+          "That'll take forever though 😭 I already signed the papers...",
+        debt: 14000,
+        stress: 10
+      },
 
-        {
-            text:'Do it. You’re only young once.',
-            rebel:false,
-            reply:'HAHA finally someone gets it 😎',
-            debt:45000,
-            stress:30,
-            trust:-5
-        }
+      {
+        text: "Do it. Life is short.",
+        reply:
+          "LET'S GOOOO 😎 I even upgraded the wheels too.",
+        debt: 25000,
+        stress: 20
+      }
     ]
-},
+  },
 
-{
+  // EVENT 2
+  {
+    title: "Crypto Disaster",
+
     message:
-    'My friend made 3x on crypto 🚀 I kinda wanna put all my savings into it.',
+      "My friend says this crypto coin is gonna 10x soon 🚀. I'm thinking about putting my entire emergency fund into it.",
 
-    choices:[
-        {
-            text:'That’s literally your emergency fund.',
-            rebel:true,
-            reply:'You’re way too conservative.',
-            debt:10000,
-            stress:25,
-            trust:8
-        },
+    choices: [
+      {
+        text: "Never gamble your emergency fund.",
+        reply:
+          "You're too conservative 😒 scared money never wins.",
+        debt: 6000,
+        stress: 20
+      },
 
-        {
-            text:'Only use like 10% max.',
-            rebel:false,
-            reply:'Alright... that’s probably smarter.',
-            debt:1000,
-            stress:5,
-            trust:10
-        },
+      {
+        text: "Only invest money you can lose.",
+        reply:
+          "If I only put in a little, I won't get rich though 😭",
+        debt: 9000,
+        stress: 25
+      },
 
-        {
-            text:'FULL SEND. Go all in.',
-            rebel:false,
-            reply:'FINANCIAL FREEDOM 🔥',
-            debt:25000,
-            stress:40,
-            trust:-5
-        }
+      {
+        text: "Go all in.",
+        reply:
+          "BRO THIS IS OUR CHANCE 🔥🔥🔥",
+        debt: 18000,
+        stress: 35
+      }
     ]
+  },
+
+  // EVENT 3
+  {
+    title: "Buy Now Pay Later",
+
+    message:
+      "I found this luxury watch online. It's only $79/month with installments. That's basically free, right? 👀",
+
+    choices: [
+      {
+        text: "Monthly payments add up fast.",
+        reply:
+          "But it's ONLY 79 bucks 😭",
+        debt: 4000,
+        stress: 10
+      },
+
+      {
+        text: "You don't need this watch.",
+        reply:
+          "You don't understand the vibe 😩",
+        debt: 7000,
+        stress: 15
+      },
+
+      {
+        text: "Treat yourself king.",
+        reply:
+          "FINALLY someone gets it 😎",
+        debt: 12000,
+        stress: 20
+      }
+    ]
+  },
+
+  // NEW EVENT 4
+  {
+    title: "Friend's Startup",
+
+    message:
+      "My friend wants me to invest $5,000 into his new business. He says if I don't support him, I'm not a real friend 😓",
+
+    choices: [
+      {
+        text: "Never invest under emotional pressure.",
+        reply:
+          "Yeah but I feel guilty saying no 😭",
+        debt: 5000,
+        stress: 15
+      },
+
+      {
+        text: "Ask to see financial projections first.",
+        reply:
+          "That feels awkward though...",
+        debt: 3000,
+        stress: 10
+      },
+
+      {
+        text: "Support your friend. Go for it.",
+        reply:
+          "I knew you'd understand 🥺",
+        debt: 15000,
+        stress: 25
+      }
+    ]
+  }
+
+];
+
+function scrollBottom(){
+  chat.scrollTop = chat.scrollHeight;
 }
 
-]
+function addKevinMessage(text){
 
-// update stats
+  chat.innerHTML += `
+    <div class="bubble kevin">
+      ${text}
+    </div>
+  `;
+
+  scrollBottom();
+}
+
+function addUserMessage(text){
+
+  chat.innerHTML += `
+    <div class="bubble user">
+      ${text}
+    </div>
+  `;
+
+  scrollBottom();
+}
+
 function updateStats(){
 
-    debtText.innerText = '$' + debt
-    stressText.innerText = stress
-    trustText.innerText = trust
+  debtText.innerText = `$${debt.toLocaleString()}`;
+  stressText.innerText = `${stress}%`;
 
-    const avatar = document.getElementById('avatar')
-
-    if(stress > 50){
-        avatar.className =
-        'w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center font-bold text-xl'
-    }
-    else{
-        avatar.className =
-        'w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xl'
-    }
 }
 
-// add message
-function addMessage(text, side='left'){
+function nextEvent(){
 
-    const div = document.createElement('div')
+  if(currentEvent >= story.length){
+    endGame();
+    return;
+  }
 
-    div.className =
-    `max-w-[80%] px-4 py-3 rounded-2xl shadow fade text-sm leading-relaxed
-    ${side === 'left'
-        ? 'bg-white self-start'
-        : 'bg-blue-500 text-white self-end'
-    }`
+  const event = story[currentEvent];
 
-    div.innerHTML = text
+  // GA4 EVENT VIEW
+  gtag('event', 'event_view', {
+    event_name: event.title
+  });
 
-    chat.appendChild(div)
+  addKevinMessage(event.message);
 
-    chat.scrollTop = chat.scrollHeight
+  choicesDiv.innerHTML = "";
+
+  event.choices.forEach(choice => {
+
+    const btn = document.createElement("button");
+
+    btn.className =
+      "w-full bg-gray-100 hover:bg-blue-100 transition p-3 rounded-xl text-left";
+
+    btn.innerText = choice.text;
+
+    btn.onclick = () => {
+
+      // GA4 CHOICE SELECTED
+      gtag('event', 'choice_selected', {
+        event_name: event.title,
+        choice: choice.text
+      });
+
+      addUserMessage(choice.text);
+
+      setTimeout(() => {
+
+        addKevinMessage(choice.reply);
+
+        debt += choice.debt;
+        stress += choice.stress;
+
+        updateStats();
+
+        currentEvent++;
+
+        choicesDiv.innerHTML = "";
+
+        setTimeout(() => {
+          nextEvent();
+        }, 1800);
+
+      }, 900);
+
+    };
+
+    choicesDiv.appendChild(btn);
+
+  });
+
 }
 
-// typing animation
-function showTyping(callback){
-
-    const typing = document.createElement('div')
-
-    typing.className =
-    'bg-white self-start px-4 py-3 rounded-2xl shadow fade typing'
-
-    typing.innerHTML =
-    `
-    <div class="flex gap-1">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    `
-
-    chat.appendChild(typing)
-
-    chat.scrollTop = chat.scrollHeight
-
-    setTimeout(() => {
-
-        typing.remove()
-
-        callback()
-
-    }, 1000)
-}
-
-// next stage
-function nextStage(){
-
-    if(currentStage >= events.length){
-        endGame()
-        return
-    }
-
-    const event = events[currentStage]
-
-    showTyping(() => {
-
-        addMessage(event.message)
-
-        renderChoices(event)
-
-    })
-}
-
-// render choices
-function renderChoices(event){
-
-    choices.innerHTML = ''
-
-    event.choices.forEach(choice => {
-
-        const btn = document.createElement('button')
-
-        btn.className =
-        'bg-gray-100 hover:bg-blue-100 transition p-3 rounded-xl text-left text-sm font-semibold'
-
-        btn.innerText = choice.text
-
-        btn.onclick = () => choose(choice)
-
-        choices.appendChild(btn)
-
-    })
-}
-
-// choose
-function choose(choice){
-
-    choices.innerHTML = ''
-
-    addMessage(choice.text, 'right')
-
-    setTimeout(() => {
-
-        showTyping(() => {
-
-            addMessage(choice.reply)
-
-            debt += choice.debt
-            stress += choice.stress
-            trust += choice.trust
-
-            updateStats()
-
-            setTimeout(() => {
-
-                const jump = document.createElement('div')
-
-                jump.className =
-                'text-center text-xs text-gray-500 fade'
-
-                jump.innerHTML =
-                choice.rebel
-                ? '⏳ Six months later... things started falling apart.'
-                : '⏳ Six months later... your advice actually helped.'
-
-                chat.appendChild(jump)
-
-                chat.scrollTop = chat.scrollHeight
-
-                currentStage++
-
-                setTimeout(() => {
-
-                    nextStage()
-
-                }, 1500)
-
-            }, 1200)
-
-        })
-
-    }, 500)
-}
-
-// end game
 function endGame(){
 
-    choices.innerHTML = ''
+  // GA4 ENDING REACHED
+  gtag('event', 'ending_reached', {
+    debt: debt,
+    stress: stress
+  });
 
-    let resultHTML = ''
+  let ending = "";
 
-    if(debt > 50000){
+  if(debt >= 45000){
 
-        resultHTML =
-        `
-        <div class="text-5xl mb-4">💀</div>
+    ending =
+      "Kevin is drowning in debt. Collection agencies are calling daily. His financial life is collapsing.";
 
-        <div class="text-2xl font-black mb-3">
-            Kevin Crashed
-        </div>
+  } else if(stress >= 70){
 
-        <div class="text-gray-600 leading-relaxed">
-            He started ignoring bills.
-            Ignoring friends.
-            And eventually ignoring reality.
-        </div>
-        `
-    }
+    ending =
+      "Kevin developed severe anxiety from financial pressure. He can barely sleep anymore.";
 
-    else{
+  } else {
 
-        resultHTML =
-        `
-        <div class="text-5xl mb-4">🛟</div>
+    ending =
+      "Kevin barely survived adulthood... but his financial future still looks unstable.";
 
-        <div class="text-2xl font-black mb-3">
-            You Almost Saved Him
-        </div>
+  }
 
-        <div class="text-gray-600 leading-relaxed">
-            Kevin is still impulsive.
-            But at least now he asks for advice first.
-        </div>
-        `
-    }
-
-    const result = document.createElement('div')
-
-    result.className =
-    'bg-white rounded-3xl p-6 shadow-lg fade'
-
-    result.innerHTML =
-    `
-    <div class="text-center">
-
-        ${resultHTML}
-
-        <div class="mt-6 bg-gray-100 rounded-2xl p-4 text-sm text-left space-y-2">
-
-            <div>💸 Final Debt: $${debt}</div>
-
-            <div>😵 Stress Level: ${stress}</div>
-
-            <div>🤝 Trust In You: ${trust}</div>
-
-        </div>
-
-        <button
-            onclick="location.reload()"
-            class="mt-6 w-full bg-black text-white py-4 rounded-xl font-bold">
-            🔄 Replay Kevin's Life
-        </button>
-
+  chat.innerHTML += `
+    <div class="bubble kevin">
+      ${ending}
     </div>
-    `
+  `;
 
-    chat.appendChild(result)
+  choicesDiv.innerHTML = `
+    <button
+      onclick="restartGame()"
+      class="w-full bg-black text-white p-4 rounded-xl font-bold"
+    >
+      🔄 Try To Save Kevin Again
+    </button>
+  `;
 
-    chat.scrollTop = chat.scrollHeight
+  scrollBottom();
+
 }
 
-// start
-updateStats()
-nextStage()
+function restartGame(){
+
+  // GA4 REPLAY CLICKED
+  gtag('event', 'replay_clicked');
+
+  location.reload();
+
+}
+
+function startGame(){
+
+  // GA4 GAME START
+  gtag('event', 'game_start');
+
+  addKevinMessage(
+    "Hey... I think my life might be getting out of control lately 😅"
+  );
+
+  setTimeout(() => {
+    nextEvent();
+  }, 1200);
+
+}
+
+startGame();
 
 </script>
 
