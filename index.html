@@ -432,4 +432,44 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span>🤝 Trust in You</span>
-                        <span class="text-blue-600
+                        <span class="text-blue-600 font-bold">${stats.trust}/100</span>
+                    </div>
+                </div>
+
+                <button onclick="handleReplay()"
+                    class="mt-6 w-full bg-slate-900 text-white rounded-xl py-4 font-bold hover:bg-slate-800 transition shadow-lg active:scale-95">
+                    🔄 Replay Kevin's Life
+                </button>
+            `;
+
+            setTimeout(() => {
+                chatBox.appendChild(result);
+                scrollToBottom();
+            }, 1000);
+        }
+
+        // 處理重玩按鈕與 GA4
+        function handleReplay() {
+            // [GA4 Tracking Event 5] - game_replay
+            gtag('event', 'game_replay', {
+                'event_category': 'Engagement'
+            });
+            
+            // 給 GA4 一點時間發送訊號再重整
+            setTimeout(() => {
+                location.reload();
+            }, 250);
+        }
+
+        // 啟動遊戲
+        window.onload = () => {
+            // [GA4 Tracking Event 1] - game_start
+            gtag('event', 'game_start', {
+                'event_category': 'Engagement'
+            });
+            runStage();
+        };
+
+    </script>
+</body>
+</html>
