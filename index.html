@@ -11,8 +11,6 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
-      // 初始化 GA4
       gtag('config', 'G-TBP17V9M20');
     </script>
 
@@ -36,7 +34,7 @@
 
     <div class="w-full max-w-sm h-[800px] max-h-screen bg-white shadow-2xl relative flex flex-col sm:rounded-[2.5rem] border-[8px] border-gray-900 overflow-hidden">
         
-        <div class="bg-gray-100/90 backdrop-blur-sm border-b border-gray-200 px-4 py-3 flex items-center gap-3 z-10 sticky top-0">
+        <div class="bg-gray-100/90 backdrop-blur-sm border-b border-gray-200 px-4 py-3 flex items-center gap-3 z-10 shrink-0">
             <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-700 to-gray-900 flex items-center justify-center text-white font-bold text-lg shadow-inner">K</div>
             <div>
                 <h2 class="font-bold text-gray-800 leading-tight">Kevin</h2>
@@ -44,18 +42,18 @@
             </div>
         </div>
 
-        <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4 pb-32 bg-slate-50">
+        <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50">
             </div>
 
-        <div id="time-jump" class="absolute inset-0 bg-slate-900/95 z-20 flex flex-col items-center justify-center hidden fade-in text-white">
-            <p class="text-gray-400 text-sm mb-2" id="jump-subtitle">3 Months Later...</p>
-            <h2 class="text-2xl font-black tracking-widest text-center px-4" id="jump-title">Life is Good</h2>
+        <div id="choice-panel" class="bg-white border-t border-gray-200 p-3 hidden slide-up shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-20 shrink-0">
+            <p class="text-[10px] font-bold text-gray-400 text-center uppercase tracking-widest mb-2">Give Advice</p>
+            <div id="choices-container" class="space-y-2 max-h-[35vh] overflow-y-auto pb-1">
+                </div>
         </div>
 
-        <div id="choice-panel" class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-200 p-2 hidden slide-up shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] z-30">
-            <p class="text-[10px] font-bold text-gray-400 text-center uppercase tracking-widest mt-1">Give Advice</p>
-            <div id="choices-container" class="space-y-2 max-h-[40vh] overflow-y-auto pb-2 px-2 mt-2">
-                </div>
+        <div id="time-jump" class="absolute inset-0 bg-slate-900/95 z-30 flex flex-col items-center justify-center hidden fade-in text-white">
+            <p class="text-gray-400 text-sm mb-2" id="jump-subtitle">3 Months Later...</p>
+            <h2 class="text-2xl font-black tracking-widest text-center px-4" id="jump-title">Life is Good</h2>
         </div>
 
     </div>
@@ -66,7 +64,6 @@
         const choicesContainer = document.getElementById('choices-container');
         const timeJump = document.getElementById('time-jump');
         
-        // Hidden Stats
         let stats = {
             trust: 50,    
             stress: 50,   
@@ -75,10 +72,10 @@
 
         let currentStage = 0;
 
-        // Scenarios Library (3 Scenarios now)
+        // Strictly Non-Insurance Scenarios
         const storyEvents = [
             {
-                // Scenario 1: The Car (Status Anxiety)
+                // Scenario 1: The Car
                 setup: [
                     "Work is stressing me out so much lately. My boss is a nightmare.",
                     "Went to a college reunion yesterday. Everyone's doing so well. Jack literally pulled up in a Porsche.",
@@ -110,7 +107,7 @@
                 ]
             },
             {
-                // Scenario 2: Crypto FOMO (Greed)
+                // Scenario 2: Crypto FOMO
                 setup: [
                     "Hey, gotta tell you something.",
                     "Jack tipped me off on this new crypto coin. It literally tripled in a month.",
@@ -144,57 +141,62 @@
                 ]
             },
             {
-                // Scenario 3: The Insurance Trap (Risk Illusion) - NEW!
+                // Scenario 3: Credit Card & BNPL Trap (Lifestyle Creep)
                 setup: [
-                    "So, the guys are booking a massive ski trip to Japan for winter.",
-                    "I don't really have the cash right now...",
-                    "BUT, I realized if I cancel my premium health insurance, I can use that money to pay for the trip installments!",
-                    "I'm 25 and perfectly healthy. It's basically throwing money away every month anyway, right?"
+                    "So, I found this gorgeous designer watch. It's normally $4,500.",
+                    "But the store has this zero-interest Buy Now Pay Later plan. It's literally only $125 a month!",
+                    "That's basically less than my weekly coffee and dining out. It's a no-brainer to look successful at work, right?"
                 ],
                 choices: [
                     {
-                        text: "Absolutely not. You cannot go uninsured. One medical emergency will bankrupt you.",
-                        trustEffect: -10, stressEffect: 10,
+                        text: "It's a trap. Splitting it into small payments doesn't mean you can afford it. Do not buy it.",
+                        trustEffect: -10, stressEffect: 20,
                         getReply: () => {
                             if (stats.trust >= 50) {
-                                return "Geez, okay fine. I'll keep the insurance and just tell the guys I can't go. Sucks though. 😔";
+                                return "Alright, alright, you're ruining my fun but I'll pass. I guess I'll just stick to my old Casio. 🙄";
                             } else {
-                                stats.debt += 45000; 
-                                stats.stress += 50;
-                                return "You sound like a boomer. I'm not wasting my youth worrying about 'what ifs'. I canceled it. Tokyo here I come!";
+                                stats.debt += 15000; 
+                                stats.stress += 30;
+                                return "Man, you have no style. It's literally $125. I bought it. My wrist looks wealthy now.";
                             }
                         },
-                        jumpTitle: "The Wake Up Call", jumpSub: "4 Months Later"
+                        jumpTitle: "The Illusion of Wealth", jumpSub: "5 Months Later"
                     },
                     {
-                        text: "How about downgrading to a basic catastrophic plan? It's cheaper, covers disasters, and you can maybe do a cheaper local trip?",
-                        trustEffect: 15, stressEffect: -5, debtEffect: 5000,
+                        text: "If you want it that badly, you have to cut out dining out completely until it's paid off. Deal?",
+                        trustEffect: 15, stressEffect: 10, debtEffect: 2500,
                         getReply: () => {
-                            return "Okay, that's a smart middle ground. I'll downgrade and we'll just do a road trip instead of Japan.";
+                            return "Deal! I'll pack my lunch for a few months. Bought the watch, it's worth the sacrifice.";
                         },
-                        jumpTitle: "The Wake Up Call", jumpSub: "4 Months Later"
+                        jumpTitle: "The Illusion of Wealth", jumpSub: "5 Months Later"
                     },
                     {
-                        text: "Cancel it! You're young and healthy. Enjoy your 20s while you can, worry about insurance later.",
-                        trustEffect: 20, stressEffect: 0, debtEffect: 65000,
+                        text: "Go for it! Looking successful actually helps you get promotions. Fake it till you make it.",
+                        trustEffect: 25, stressEffect: 5, debtEffect: 18000,
                         getReply: () => {
-                            return "Exactly! Why pay for something I never use? Flights to Tokyo are booked! 🏂🎌";
+                            return "Exactly! Investment in my personal brand. Picked it up today, feels amazing!";
                         },
-                        jumpTitle: "The Wake Up Call", jumpSub: "4 Months Later"
+                        jumpTitle: "The Illusion of Wealth", jumpSub: "5 Months Later"
                     }
                 ]
             }
         ];
 
         function scrollToBottom() {
-            chatBox.scrollTop = chatBox.scrollHeight;
+            // Smoothly scrolls to ensure the latest bubble is completely visible
+            setTimeout(() => {
+                chatBox.scrollTo({
+                    top: chatBox.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 50);
         }
 
         function showTyping(callback) {
             const id = 'typing-' + Date.now();
             chatBox.insertAdjacentHTML('beforeend', `
                 <div id="${id}" class="flex gap-2 w-max max-w-[75%] px-4 py-3 rounded-2xl chat-bubble-k slide-up items-center">
-                    <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"></div>
                     <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
                     <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
                 </div>
@@ -204,7 +206,7 @@
                 const el = document.getElementById(id);
                 if(el) el.remove();
                 callback();
-            }, 1800);
+            }, 1500);
         }
 
         function addKevinMessage(text) {
@@ -232,7 +234,7 @@
                     showTyping(() => {
                         addKevinMessage(messages[i]);
                         i++;
-                        setTimeout(sendNext, 1200); // Slightly slower for better reading pace
+                        setTimeout(sendNext, 1000); 
                     });
                 } else {
                     if (callback) callback();
@@ -254,13 +256,13 @@
             });
             
             choicePanel.classList.remove('hidden');
+            scrollToBottom(); // Push window up naturally when options pop up
         }
 
         function handleChoice(choice, event) {
             choicePanel.classList.add('hidden');
             addUserMessage(choice.text);
             
-            // [GA4 Tracking Event 3] - choice_made
             gtag('event', 'choice_made', {
                 'event_category': 'Decision',
                 'stage': currentStage + 1,
@@ -318,7 +320,6 @@
         }
 
         function runStage() {
-            // [GA4 Tracking Event 2] - scenario_reached
             gtag('event', 'scenario_reached', {
                 'event_category': 'Progress',
                 'stage_number': currentStage + 1
@@ -331,31 +332,30 @@
             }, 1000);
         }
 
-        // 終局對話鋪墊 (新增醫療危機後果)
         function triggerEndingDialogue() {
             setTimeout(() => {
                 let endingMsg = [];
-                if (stats.debt > 40000) {
+                if (stats.debt > 50000) {
                     endingMsg = [
                         "Hey man, are you there?",
-                        "I'm completely screwed...",
-                        "My appendix burst out of nowhere. Emergency surgery.",
-                        "Because of all the other stuff, I had no safety net. The hospital bills are insane.",
-                        "Collections won't stop calling. They're going to repo the car..."
+                        "I am completely drowning.",
+                        "The interest on the car and credit cards built up way faster than I thought. I can barely pay the minimums.",
+                        "Now the tech market crashed, my company laid me off, and my credit score just tanked.",
+                        "They're repossessing the car tomorrow. I don't know what to do..."
                     ];
                 } else if (stats.stress > 60) {
                     endingMsg = [
                         "Hey...",
-                        "I had a medical scare last week. Appendicitis.",
-                        "The basic insurance covered some of it, but the out-of-pocket still wiped out everything I had.",
-                        "I'm barely keeping my head above water right now. It's so stressful."
+                        "Things got really tight this month.",
+                        "Between the payments and high cost of living, I have zero savings left.",
+                        "I'm constantly stressed out about making rent. Feels like I'm one mistake away from ruin."
                     ];
                 } else {
                     endingMsg = [
                         "Hey!",
-                        "Crazy month. My appendix burst and I had to get emergency surgery.",
-                        "It sucked, but thank God I kept that insurance plan and had some savings left.",
-                        "Could've been a total disaster, but I'm surviving."
+                        "Crazy year. A lot of my friends got laid off and went into debt.",
+                        "Honestly, thank God I listened to some of your warnings and avoided those heavy payment plans.",
+                        "I don't have a luxury lifestyle, but I can sleep peacefully at night."
                     ];
                 }
 
@@ -367,12 +367,10 @@
             }, 2000);
         }
 
-        // 結算畫面
         function endGame() {
             choicePanel.classList.add('hidden');
             choicesContainer.innerHTML = '';
 
-            // [GA4 Tracking Event 4] - game_complete
             gtag('event', 'game_complete', {
                 'event_category': 'Completion',
                 'final_debt': stats.debt,
@@ -382,13 +380,13 @@
 
             let ending = '';
 
-            if (stats.debt > 50000 || stats.stress > 80) {
+            if (stats.debt > 40000 || stats.stress > 75) {
                 ending = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">💀</div>
                         <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin Crashed.</div>
                         <div class="text-gray-500 text-sm leading-relaxed">
-                            He lost his cash flow.<br>He has zero risk tolerance left.<br>And he's ghosting everyone's texts.
+                            He completely ran out of cash flow.<br>He has zero financial resilience left.<br>And he's ghosting everyone's texts.
                         </div>
                     </div>
                 `;
@@ -396,9 +394,9 @@
                 ending = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">🛟</div>
-                        <div class="text-2xl font-black text-gray-800 tracking-tight">You Almost Saved Him.</div>
+                        <div class="text-2xl font-black text-gray-800 tracking-tight">You Saved Him.</div>
                         <div class="text-gray-500 text-sm leading-relaxed">
-                            Kevin is still impulsive.<br>But he's starting to ask you for advice before doing something stupid.
+                            Kevin still has impulsive urges.<br>But he officially trusts you enough to ask for advice before making big financial moves.
                         </div>
                     </div>
                 `;
@@ -406,9 +404,9 @@
                 ending = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">😶</div>
-                        <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin is Struggling.</div>
+                        <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin is Surviving.</div>
                         <div class="text-gray-500 text-sm leading-relaxed">
-                            His life isn't completely ruined.<br>But he hasn't really grown up yet either.
+                            His life isn't totally destroyed,<br>but he's living paycheck to paycheck and hasn't truly grown up yet.
                         </div>
                     </div>
                 `;
@@ -448,28 +446,15 @@
             }, 1000);
         }
 
-        // 處理重玩按鈕與 GA4
         function handleReplay() {
-            // [GA4 Tracking Event 5] - game_replay
-            gtag('event', 'game_replay', {
-                'event_category': 'Engagement'
-            });
-            
-            // 給 GA4 一點時間發送訊號再重整
-            setTimeout(() => {
-                location.reload();
-            }, 250);
+            gtag('event', 'game_replay', { 'event_category': 'Engagement' });
+            setTimeout(() => { location.reload(); }, 250);
         }
 
-        // 啟動遊戲
         window.onload = () => {
-            // [GA4 Tracking Event 1] - game_start
-            gtag('event', 'game_start', {
-                'event_category': 'Engagement'
-            });
+            gtag('event', 'game_start', { 'event_category': 'Engagement' });
             runStage();
         };
-
     </script>
 </body>
 </html>
