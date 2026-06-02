@@ -22,13 +22,15 @@
         .slide-up { animation: slideUp 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .chat-bubble-k { background-color: #f3f4f6; color: #1f2937; border-bottom-left-radius: 4px; }
         .chat-bubble-u { background-color: #3b82f6; color: #ffffff; border-bottom-right-radius: 4px; }
         .system-bubble { background: transparent; border: 1px solid #e5e7eb; border-radius: 4px; color: #6b7280; font-size: 0.75rem; text-align: center; padding: 6px 12px; margin: 0 auto; text-transform: uppercase; letter-spacing: 0.05em;}
         .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        
+        /* Smooth background transitions for the chat room */
+        #chat-box { transition: background-color 0.8s ease-in-out; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen py-4 sm:py-8">
@@ -71,7 +73,6 @@
         let scenarioStartTime = 0; 
         let currentEndingType = ''; 
 
-        // Authentic American Dialogue & Two-Step Pushback Mechanic
         const storyEvents = [
             {
                 scenarioName: "The Car (Status Anxiety)",
@@ -156,10 +157,29 @@
             }, 50);
         }
 
+        // --- NEW: Emotion/Mood Manager ---
+        function setChatMood(mood) {
+            // Remove existing background tints
+            chatBox.classList.remove('bg-slate-50', 'bg-red-50', 'bg-green-50', 'bg-slate-200');
+            
+            // Apply new background tint based on mood
+            if (mood === 'argue') chatBox.classList.add('bg-red-50');
+            else if (mood === 'agree') chatBox.classList.add('bg-green-50');
+            else if (mood === 'upset') chatBox.classList.add('bg-slate-200');
+            else chatBox.classList.add('bg-slate-50'); // neutral
+        }
+
+        function getBubbleStyle(mood) {
+            if (mood === 'argue') return 'bg-red-100 text-red-900 border border-red-200 font-medium';
+            if (mood === 'agree') return 'bg-green-100 text-green-900 border border-green-200';
+            if (mood === 'upset') return 'bg-gray-300 text-gray-800 border border-gray-400 italic';
+            return 'bg-gray-100 text-gray-800 border border-gray-200'; // neutral
+        }
+
         function showTyping(callback) {
             const id = 'typing-' + Date.now();
             chatBox.insertAdjacentHTML('beforeend', `
-                <div id="${id}" class="flex gap-2 w-max max-w-[75%] px-4 py-3 rounded-2xl chat-bubble-k slide-up items-center">
+                <div id="${id}" class="flex gap-2 w-max max-w-[75%] px-4 py-3 rounded-2xl bg-gray-100 border border-gray-200 slide-up items-center rounded-bl-sm">
                     <div class="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"></div>
                     <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
                     <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
@@ -173,14 +193,16 @@
             }, 1200);
         }
 
-        function addKevinMessage(text, isSystem = false) {
+        function addKevinMessage(text, isSystem = false, mood = 'neutral') {
             if (isSystem) {
                 chatBox.insertAdjacentHTML('beforeend', `
                     <div class="system-bubble slide-up my-2">${text}</div>
                 `);
             } else {
+                setChatMood(mood);
+                const bubbleStyle = getBubbleStyle(mood);
                 chatBox.insertAdjacentHTML('beforeend', `
-                    <div class="flex gap-2 w-max max-w-[85%] px-4 py-3 rounded-2xl chat-bubble-k slide-up text-[15px] leading-relaxed shadow-sm">
+                    <div class="flex gap-2 w-max max-w-[85%] px-4 py-3 rounded-2xl ${bubbleStyle} slide-up text-[15px] leading-relaxed shadow-sm rounded-bl-sm">
                         ${text}
                     </div>
                 `);
@@ -190,19 +212,19 @@
 
         function addUserMessage(text) {
             chatBox.insertAdjacentHTML('beforeend', `
-                <div class="flex gap-2 w-max max-w-[85%] px-4 py-3 rounded-2xl chat-bubble-u slide-up text-[15px] leading-relaxed shadow-sm self-end">
+                <div class="flex gap-2 w-max max-w-[85%] px-4 py-3 rounded-2xl chat-bubble-u slide-up text-[15px] leading-relaxed shadow-sm self-end rounded-br-sm">
                     ${text}
                 </div>
             `);
             scrollToBottom();
         }
 
-        function sendMessageSequence(messages, callback) {
+        function sendMessageSequence(messages, mood = 'neutral', callback) {
             let i = 0;
             function sendNext() {
                 if (i < messages.length) {
                     showTyping(() => {
-                        addKevinMessage(messages[i]);
+                        addKevinMessage(messages[i], false, mood);
                         i++;
                         setTimeout(sendNext, 800); 
                     });
@@ -239,7 +261,6 @@
             addUserMessage(choice.text);
             
             if (!isFollowup) {
-                // Phase 1: User gives initial advice, Kevin ALWAYS pushes back
                 gtag('event', 'choice_made', {
                     'event_category': 'Decision',
                     'scenario_name': event.scenarioName,
@@ -252,13 +273,13 @@
 
                 setTimeout(() => {
                     showTyping(() => {
-                        addKevinMessage(event.followup);
+                        // Kevin argues back (Red Vibe)
+                        addKevinMessage(event.followup, false, 'argue');
                         setTimeout(() => promptChoices(currentStage, true), 800);
                     });
                 }, 600);
 
             } else {
-                // Phase 2: The final decision
                 gtag('event', 'followup_choice_made', {
                     'event_category': 'Decision',
                     'scenario_name': event.scenarioName,
@@ -268,27 +289,28 @@
                 stats.debt += choice.debtEffect;
                 stats.stress += choice.stressEffect;
 
-                // Determine if Kevin listens based on your strictness and trust
                 let listened = false;
                 if (choice.isStrict) {
-                    listened = (Math.random() * 100) < stats.trust + 20; // Better chance if trust is high
+                    listened = (Math.random() * 100) < stats.trust + 20; 
                 }
 
                 const finalReply = listened ? event.listenMsg : event.resistMsg;
+                const replyMood = listened ? 'agree' : 'argue';
 
                 setTimeout(() => {
                     showTyping(() => {
-                        addKevinMessage(finalReply);
+                        addKevinMessage(finalReply, false, replyMood);
                         
                         setTimeout(() => {
-                            triggerTimeJump(event.jumpTitle, event.jumpSub, listened ? event.outcomeListened : event.outcomeIgnored);
+                            let consequenceMood = listened ? 'agree' : 'upset';
+                            triggerTimeJump(event.jumpTitle, event.jumpSub, listened ? event.outcomeListened : event.outcomeIgnored, consequenceMood);
                         }, 2500);
                     });
                 }, 800);
             }
         }
 
-        function triggerTimeJump(title, subtitle, consequence) {
+        function triggerTimeJump(title, subtitle, consequenceText, consequenceMood) {
             document.getElementById('jump-title').innerText = title;
             document.getElementById('jump-subtitle').innerText = subtitle;
             timeJump.classList.remove('hidden');
@@ -296,7 +318,8 @@
             setTimeout(() => {
                 timeJump.classList.add('hidden');
                 setTimeout(() => {
-                    addKevinMessage(consequence, true); // Renders as a system message
+                    // Render the consequence visually with the correct mood
+                    addKevinMessage(consequenceText, false, consequenceMood); 
                     
                     setTimeout(() => {
                         currentStage++;
@@ -317,7 +340,8 @@
             });
 
             setTimeout(() => {
-                sendMessageSequence(storyEvents[currentStage].setup, () => {
+                // Setup is always neutral
+                sendMessageSequence(storyEvents[currentStage].setup, 'neutral', () => {
                     setTimeout(() => promptChoices(currentStage, false), 500);
                 });
             }, 1000);
@@ -326,8 +350,11 @@
         function triggerEndingDialogue() {
             setTimeout(() => {
                 let endingMsg = [];
+                let finalMood = 'neutral';
+
                 if (stats.debt > 40000 || stats.stress > 70) {
                     currentEndingType = 'ending_crashed';
+                    finalMood = 'upset'; // Dark Gray
                     endingMsg = [
                         "Hey man, are you there?",
                         "I am completely drowning.",
@@ -337,6 +364,7 @@
                     ];
                 } else if (stats.trust > 60) {
                     currentEndingType = 'ending_saved';
+                    finalMood = 'agree'; // Green
                     endingMsg = [
                         "Hey!",
                         "Crazy year. A lot of my friends got laid off and went into debt.",
@@ -345,6 +373,7 @@
                     ];
                 } else {
                     currentEndingType = 'ending_struggling';
+                    finalMood = 'upset'; // Dark Gray
                     endingMsg = [
                         "Hey...",
                         "Things got really tight this month.",
@@ -353,7 +382,7 @@
                     ];
                 }
 
-                sendMessageSequence(endingMsg, () => {
+                sendMessageSequence(endingMsg, finalMood, () => {
                     setTimeout(() => {
                         endGame();
                     }, 2000);
