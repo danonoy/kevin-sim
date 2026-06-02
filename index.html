@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kevin Life Simulator Beta</title>
+    <title>Kevin Life Simulator v3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
@@ -29,7 +29,6 @@
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
         
-        /* Smooth background transitions for the chat room */
         #chat-box { transition: background-color 0.8s ease-in-out; }
     </style>
 </head>
@@ -73,24 +72,38 @@
         let scenarioStartTime = 0; 
         let currentEndingType = ''; 
 
+        // Smart Branching Story Logic
         const storyEvents = [
             {
                 scenarioName: "The Car (Status Anxiety)",
                 setup: [
                     "Dude, I'm seriously thinking about getting a Model Y 😅",
-                    "Payments would be like $1,100 a month. I make $4,200, so... that's fine, right?",
-                    "Went to my buddy's birthday last weekend and THREE people pulled up in new cars. I showed up in my old Corolla and wanted to die 😩"
+                    "Payments would be like $1,100 a month. I make $3,800, so... that's fine, right?",
+                    "Went to my buddy's birthday last weekend and THREE people pulled up in new cars. I showed up in my 2015 Corolla and wanted to die 😩"
                 ],
                 choices: [
-                    { text: "That's a terrible idea right now. Save up a real down payment first.", tone: "rational" },
-                    { text: "Get a used EV instead. Same vibe, way less financial damage.", tone: "compromise" },
-                    { text: "It's your money, man. Do what you want.", tone: "passive" }
-                ],
-                followup: "I hear you, but you don't get it — showing up in that Corolla is embarrassing. And $1,100 is what, like skipping a few dinners out? I can make it work 😤",
-                followup_choices: [
-                    { text: "$1,100 x 72 months. You have barely any savings. Do the math.", debtEffect: 15000, stressEffect: 10, isStrict: true },
-                    { text: "Real friends aren't gonna respect you more because of a car. Don't go broke trying to impress them.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                    { text: "Alright, fine. Your call. Treat yourself.", debtEffect: 85000, stressEffect: 30, isStrict: false }
+                    { 
+                        text: "That's a terrible idea right now. Save up a real down payment first.", 
+                        tone: "rational",
+                        leadsToPushback: true,
+                        immediateReply: "You always just lecture me. You don't understand what it feels like to be looked down on. I can make it work 😤",
+                        replyMood: "argue",
+                        followup_choices: [
+                            { text: "$1,100 x 72 months. You have $8K saved. Do the math, Kevin.", debtEffect: 0, stressEffect: -10, isStrict: true },
+                            { text: "Real friends aren't gonna respect you more because of a car.", debtEffect: 0, stressEffect: -10, isStrict: true },
+                            { text: "Alright, fine. Your call. Treat yourself.", debtEffect: 65000, stressEffect: 30, isStrict: false }
+                        ]
+                    },
+                    { 
+                        text: "You only live once! Do it. You gotta look the part to get the part.", 
+                        tone: "enabling",
+                        leadsToPushback: false,
+                        immediateReply: "Haha I knew you'd get it! I'm signing the papers today. Sick! 😎",
+                        replyMood: "agree",
+                        debtEffect: 65000, stressEffect: 20,
+                        consequence: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"",
+                        consequenceMood: "upset"
+                    }
                 ],
                 listenMsg: "...Okay yeah, when you put it that way, $1,100 plus insurance is basically 40% of my take-home. I'm gonna hold off. 😮",
                 resistMsg: "Nah, I already went back to test drive it again. It felt amazing. I'm doing it 😤",
@@ -104,18 +117,31 @@
                 setup: [
                     "Okay so my buddy Jack just turned $20K into $80K in like 6 weeks on this one coin 👀",
                     "He's telling me I need to get in NOW, before it explodes even more.",
-                    "I only have my emergency fund but honestly... this feels like a once-in-a-lifetime thing, you know?"
+                    "I only have my savings but honestly... this feels like a once-in-a-lifetime thing, you know?"
                 ],
                 choices: [
-                    { text: "That money is your emergency fund. You don't gamble with it. 5% max.", tone: "rational" },
-                    { text: "Ask him which coin. Look up the whitepaper first before doing anything.", tone: "curious" },
-                    { text: "Your buddy made money, so it could work. Go for it.", tone: "fomo" }
-                ],
-                followup: "But he LITERALLY made $60K. That's real money. He said this window closes this week. Am I just supposed to sit here and watch? I don't wanna be the guy who missed out 😤",
-                followup_choices: [
-                    { text: "'Guaranteed returns' and 'closes soon' are textbook scam red flags.", debtEffect: 0, stressEffect: -5, isStrict: true },
-                    { text: "You only see the wins. For every guy who got rich, ten people lost everything.", debtEffect: 0, stressEffect: -5, isStrict: true },
-                    { text: "Okay fine, put in a little. Like $1,000 max.", debtEffect: 10000, stressEffect: 20, isStrict: false }
+                    { 
+                        text: "That money is your emergency fund. You don't gamble with it. 5% max.", 
+                        tone: "rational",
+                        leadsToPushback: true,
+                        immediateReply: "But he LITERALLY made $60K. That's real money. Am I just supposed to sit here and watch? I don't wanna be the guy who missed out 😤",
+                        replyMood: "argue",
+                        followup_choices: [
+                            { text: "'Guaranteed returns' and 'closes soon' are textbook scam red flags.", debtEffect: 0, stressEffect: -5, isStrict: true },
+                            { text: "You only see the wins. For every guy who got rich, ten people lost everything.", debtEffect: 0, stressEffect: -5, isStrict: true },
+                            { text: "Okay fine, put in a little. Like $1,000 max.", debtEffect: 8000, stressEffect: 20, isStrict: false }
+                        ]
+                    },
+                    { 
+                        text: "Jack made money, so it could work. Scared money makes no money. Go for it.", 
+                        tone: "enabling",
+                        leadsToPushback: false,
+                        immediateReply: "Exactly! You miss 100% of the shots you don't take. I'm wiring my savings over right now. 🚀",
+                        replyMood: "agree",
+                        debtEffect: 12000, stressEffect: 30,
+                        consequence: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"",
+                        consequenceMood: "upset"
+                    }
                 ],
                 listenMsg: "I looked it up. The website is three months old and my buddy's been weirdly pushy about it. I think I almost got got. Thanks for talking me down 😅",
                 resistMsg: "You're too scared of everything. I'm not missing this. I put half my savings in and maxed a credit card to buy the dip. Feeling good about this one 😏",
@@ -125,29 +151,42 @@
                 outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\""
             },
             {
-                scenarioName: "BNPL Trap (Lifestyle Creep)",
+                scenarioName: "The Lease Trap",
                 setup: [
-                    "Just got approved for a zero-interest Buy Now Pay Later account 🙂",
-                    "There's this designer watch I've been wanting. It's $4,500. Limited edition.",
-                    "I can do 36 months at like $125 a month. That's basically nothing. Less than my weekend coffees."
+                    "So my girlfriend wants to move in together. We've been together three years 😶",
+                    "I love her, but honestly? I'm not sure I'm ready. Something feels off.",
+                    "She basically said if I'm not ready after 3 years, maybe I don't actually see a future with her..."
                 ],
                 choices: [
-                    { text: "$125 x 36 months is still debt. You're locking up your future income for a watch.", tone: "rational" },
-                    { text: "How much did you actually save this month? If it's more than $4,500, fine. If not, no.", tone: "conditional" },
-                    { text: "You work hard. Treat yourself.", tone: "passive" }
+                    { 
+                        text: "Your gut feeling matters. 'Not sure' is valid — talk to her about what's actually making you hesitate.", 
+                        tone: "rational",
+                        leadsToPushback: true,
+                        immediateReply: "Her friends are telling her if a guy won't move in after 3 years, he's not serious. I don't want to lose her over this 😔",
+                        replyMood: "argue",
+                        followup_choices: [
+                            { text: "Using pressure to force a decision isn't love. A good relationship can handle an honest conversation.", debtEffect: 0, stressEffect: -10, isStrict: true },
+                            { text: "Have you actually told her what's making you hesitate? She might not even know.", debtEffect: 0, stressEffect: -10, isStrict: true },
+                            { text: "Just go with it. It's been 3 years, it'll probably be fine.", debtEffect: 8000, stressEffect: 20, isStrict: false }
+                        ]
+                    },
+                    { 
+                        text: "She's been waiting three years. If you don't do it now, you'll lose her. Just do it.", 
+                        tone: "enabling",
+                        leadsToPushback: false,
+                        immediateReply: "You're right, I'm just overthinking it. We're gonna go sign a 12-month lease today. Wish me luck! 🏠",
+                        replyMood: "agree",
+                        debtEffect: 8000, stressEffect: 35,
+                        consequence: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"",
+                        consequenceMood: "upset"
+                    }
                 ],
-                followup: "But it's literally $125 a month. I spend more than that going out on a random weekend anyway. And it's limited edition — if I don't get it now, it's gone forever 😩",
-                followup_choices: [
-                    { text: "How many other subscriptions and payments do you have? Add them all up.", debtEffect: 0, stressEffect: -5, isStrict: true },
-                    { text: "FOMO is the most expensive feeling you can have. You'll regret the debt way longer.", debtEffect: 0, stressEffect: -5, isStrict: true },
-                    { text: "Fine, get the watch. You'll figure it out.", debtEffect: 15000, stressEffect: 25, isStrict: false }
-                ],
-                listenMsg: "Okay I actually added it up. Phone, laptop, car — I'm already paying $400 a month in installments. Adding this watch puts me over $500. I'm gonna pass.",
-                resistMsg: "Man, you have no style. It's literally $125. I bought it. My wrist looks wealthy now ✌️",
-                jumpTitle: "The Illusion of Wealth",
-                jumpSub: "5 Months Later",
-                outcomeListened: "Kevin paid off his other installment plans. He texts: \"Bro I never knew how much I was paying out every month. This is the first time I actually feel like I'm in control of my cash flow.\"",
-                outcomeIgnored: "Kevin is juggling five credit cards and BNPL apps. He texts you: \"I don't understand where my money goes. I make decent money but I'm always broke by the 20th.\" He sounds defeated."
+                listenMsg: "I sat her down and told her what was bothering me. She was upset at first, but she had no idea I felt that way. We decided to wait six months and talk properly. Feels way better.",
+                resistMsg: "I don't want to overcomplicate it. She moves in next month 🙂 It'll be fine I think.",
+                jumpTitle: "The Breaking Point",
+                jumpSub: "8 Months Later",
+                outcomeListened: "Kevin texts: \"We moved in together last month — but this time because we both actually wanted to. Completely different energy. Thanks for telling me to slow down.\"",
+                outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\""
             }
         ];
 
@@ -157,23 +196,19 @@
             }, 50);
         }
 
-        // --- NEW: Emotion/Mood Manager ---
         function setChatMood(mood) {
-            // Remove existing background tints
             chatBox.classList.remove('bg-slate-50', 'bg-red-50', 'bg-green-50', 'bg-slate-200');
-            
-            // Apply new background tint based on mood
             if (mood === 'argue') chatBox.classList.add('bg-red-50');
             else if (mood === 'agree') chatBox.classList.add('bg-green-50');
             else if (mood === 'upset') chatBox.classList.add('bg-slate-200');
-            else chatBox.classList.add('bg-slate-50'); // neutral
+            else chatBox.classList.add('bg-slate-50'); 
         }
 
         function getBubbleStyle(mood) {
             if (mood === 'argue') return 'bg-red-100 text-red-900 border border-red-200 font-medium';
             if (mood === 'agree') return 'bg-green-100 text-green-900 border border-green-200';
             if (mood === 'upset') return 'bg-gray-300 text-gray-800 border border-gray-400 italic';
-            return 'bg-gray-100 text-gray-800 border border-gray-200'; // neutral
+            return 'bg-gray-100 text-gray-800 border border-gray-200'; 
         }
 
         function showTyping(callback) {
@@ -195,9 +230,7 @@
 
         function addKevinMessage(text, isSystem = false, mood = 'neutral') {
             if (isSystem) {
-                chatBox.insertAdjacentHTML('beforeend', `
-                    <div class="system-bubble slide-up my-2">${text}</div>
-                `);
+                chatBox.insertAdjacentHTML('beforeend', `<div class="system-bubble slide-up my-2">${text}</div>`);
             } else {
                 setChatMood(mood);
                 const bubbleStyle = getBubbleStyle(mood);
@@ -269,17 +302,28 @@
                 });
                 
                 if (choice.tone === 'rational') stats.trust += 5;
-                if (choice.tone === 'passive') stats.trust -= 10;
+                if (choice.tone === 'enabling') stats.trust -= 10;
 
                 setTimeout(() => {
                     showTyping(() => {
-                        // Kevin argues back (Red Vibe)
-                        addKevinMessage(event.followup, false, 'argue');
-                        setTimeout(() => promptChoices(currentStage, true), 800);
+                        addKevinMessage(choice.immediateReply, false, choice.replyMood);
+                        
+                        if (choice.leadsToPushback) {
+                            // Phase 2: Pushback
+                            setTimeout(() => promptChoices(currentStage, true), 1000);
+                        } else {
+                            // Skipped Pushback (Enabling path) -> Straight to consequence
+                            stats.debt += choice.debtEffect;
+                            stats.stress += choice.stressEffect;
+                            setTimeout(() => {
+                                triggerTimeJump(event.jumpTitle, event.jumpSub, choice.consequence, choice.consequenceMood);
+                            }, 2500);
+                        }
                     });
                 }, 600);
 
             } else {
+                // Phase 2: Final decision
                 gtag('event', 'followup_choice_made', {
                     'event_category': 'Decision',
                     'scenario_name': event.scenarioName,
@@ -318,7 +362,6 @@
             setTimeout(() => {
                 timeJump.classList.add('hidden');
                 setTimeout(() => {
-                    // Render the consequence visually with the correct mood
                     addKevinMessage(consequenceText, false, consequenceMood); 
                     
                     setTimeout(() => {
@@ -340,7 +383,6 @@
             });
 
             setTimeout(() => {
-                // Setup is always neutral
                 sendMessageSequence(storyEvents[currentStage].setup, 'neutral', () => {
                     setTimeout(() => promptChoices(currentStage, false), 500);
                 });
@@ -352,33 +394,32 @@
                 let endingMsg = [];
                 let finalMood = 'neutral';
 
-                if (stats.debt > 40000 || stats.stress > 70) {
+                if (stats.debt > 25000 || stats.stress > 65) {
                     currentEndingType = 'ending_crashed';
-                    finalMood = 'upset'; // Dark Gray
+                    finalMood = 'upset'; 
                     endingMsg = [
                         "Hey man, are you there?",
                         "I am completely drowning.",
-                        "The interest on the car and credit cards built up way faster than I thought. I can barely pay the minimums.",
-                        "Now the tech market crashed, my company laid me off, and my credit score just tanked.",
-                        "They're repossessing the car tomorrow. I don't know what to do..."
+                        "Everything piled up way faster than I thought. The debt, the bills... I can barely pay the minimums.",
+                        "My credit score is wrecked and I'm totally burnt out. I don't know what to do..."
                     ];
-                } else if (stats.trust > 60) {
+                } else if (stats.trust > 55) {
                     currentEndingType = 'ending_saved';
-                    finalMood = 'agree'; // Green
+                    finalMood = 'agree'; 
                     endingMsg = [
                         "Hey!",
-                        "Crazy year. A lot of my friends got laid off and went into debt.",
-                        "Honestly, thank God I listened to some of your warnings and avoided those heavy payment plans.",
-                        "I don't have a luxury lifestyle, but I can sleep peacefully at night."
+                        "Crazy year. A lot of my friends ended up in massive debt or terrible situations.",
+                        "Honestly, thank God I listened to some of your warnings and slowed down.",
+                        "I might not have everything figured out, but I can sleep peacefully at night."
                     ];
                 } else {
                     currentEndingType = 'ending_struggling';
-                    finalMood = 'upset'; // Dark Gray
+                    finalMood = 'upset'; 
                     endingMsg = [
                         "Hey...",
                         "Things got really tight this month.",
                         "Between the payments and high cost of living, I have zero savings left.",
-                        "I'm constantly stressed out about making rent. Feels like I'm one mistake away from ruin."
+                        "I'm constantly stressed out. Feels like I'm one mistake away from ruin."
                     ];
                 }
 
@@ -412,7 +453,7 @@
                         <div class="text-6xl mb-4">🛟</div>
                         <div class="text-2xl font-black text-gray-800 tracking-tight">You Saved Him.</div>
                         <div class="text-gray-500 text-sm leading-relaxed">
-                            Kevin still has impulsive urges.<br>But he officially trusts you enough to ask for advice before making big financial moves.
+                            Kevin still has impulsive urges.<br>But he officially trusts you enough to ask for advice before making big life moves.
                         </div>
                     </div>
                 `;
