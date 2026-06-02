@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kevin Life Simulator v3.1</title>
+    <title>Kevin Life Simulator v3.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
@@ -28,7 +28,6 @@
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
         @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-        
         #chat-box { transition: background-color 0.8s ease-in-out; }
     </style>
 </head>
@@ -72,6 +71,7 @@
         let scenarioStartTime = 0; 
         let currentEndingType = ''; 
 
+        // Strictly Audited Dialogue Tree
         const storyEvents = [
             {
                 scenarioName: "The Car (Status Anxiety)",
@@ -83,38 +83,42 @@
                 choices: [
                     { 
                         text: "That's a terrible idea right now. Save up a real down payment first.", 
-                        tone: "rational", leadsToPushback: true, replyMood: "argue",
-                        immediateReply: "You always just lecture me. You don't understand what it feels like to be looked down on. I can make it work 😤",
+                        trustEffect: 5,
+                        kevinReply: "You always just lecture me. You don't understand what it feels like to be looked down on. I can make it work 😤",
+                        mood: "argue",
+                        nextStep: "followup",
                         followup_choices: [
-                            { text: "$1,100 x 72 months. You have $8K saved. Do the math, Kevin.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                            { text: "Real friends aren't gonna respect you more because of a car.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                            { text: "Alright, fine. Your call. Treat yourself.", debtEffect: 65000, stressEffect: 30, isStrict: false }
+                            { text: "$1,100 x 72 months. You have $8K saved. Do the math, Kevin.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Okay yeah, when you put it that way... $1,100 plus insurance is basically 40% of my take-home. I'm gonna hold off. 😮", resistMsg: "I don't care, I already went back to test drive it. It felt amazing. I'm doing it 😤", jumpTitle: "The Reality Check", jumpSub: "6 Months Later", outcomeListened: "Kevin didn't buy the car. He texts you: \"Hey, remember when you talked me out of the Model Y? My coworker just bought one and he literally can't afford lunch now. Thanks for that.\"", outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
+                            { text: "Real friends aren't gonna respect you more because of a car.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Damn... you're probably right. If Jack cares about what car I drive, that's his problem. I'll stick with the Corolla for now.", resistMsg: "Easy for you to say. I'm tired of feeling like I'm falling behind. I'm buying it.", jumpTitle: "The Reality Check", jumpSub: "6 Months Later", outcomeListened: "Kevin didn't buy the car. He texts you: \"Hey, remember when you talked me out of the Model Y? My coworker just bought one and he literally can't afford lunch now. Thanks for that.\"", outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
+                            { text: "Alright, fine. Your call. Treat yourself.", isStrict: false, debtEffect: 65000, stressEffect: 30, listenMsg: "Haha I knew you'd get it! I'm signing the papers today. Sick! 😎", resistMsg: "Haha I knew you'd get it! I'm signing the papers today. Sick! 😎", jumpTitle: "Peak Euphoria", jumpSub: "2 Months Later", outcomeListened: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"", outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" }
                         ]
                     },
                     { 
                         text: "Get a used EV instead. Same vibe, way less financial damage.", 
-                        tone: "compromise", leadsToPushback: true, replyMood: "argue",
-                        immediateReply: "A used EV? Come on, Jack pulled up in a Porsche. I can't show up in a used Leaf. It has to be the new Model Y. 😩",
+                        trustEffect: 5,
+                        kevinReply: "A used EV? Come on, Jack pulled up in a Porsche. I can't show up in a used Leaf. It has to be the new Model Y. 😩",
+                        mood: "argue",
+                        nextStep: "followup",
                         followup_choices: [
-                            { text: "Don't go broke trying to impress Jack. Buy what you can actually afford.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                            { text: "A used Tesla still looks new to most people. Save your cash.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                            { text: "Whatever, get the new one if you care about Jack's opinion that much.", debtEffect: 65000, stressEffect: 30, isStrict: false }
+                            { text: "Don't go broke trying to impress Jack. Buy what you can actually afford.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Yeah... impressing Jack isn't worth going broke. I backed out and got a used Golf instead. It's fine.", resistMsg: "I'm not compromising on this. I want the new one and I'm getting it. 😤", jumpTitle: "A Modest Compromise", jumpSub: "2 Months Later", outcomeListened: "Kevin texts: \"The used car is fine. Not as flashy, but it gets me around and I'm not stressing over the payments at all.\"", outcomeIgnored: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
+                            { text: "A used Tesla still looks brand new to most people. Save your cash.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Actually, you make a good point. Found a used 2021 model for way cheaper. Going with that instead.", resistMsg: "No, I want the newest tech. I'm signing for the brand new one today.", jumpTitle: "A Modest Compromise", jumpSub: "2 Months Later", outcomeListened: "Kevin texts: \"The used car is fine. Not as flashy, but it gets me around and I'm not stressing over the payments at all.\"", outcomeIgnored: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
+                            { text: "Whatever, get the new one if you care about Jack's opinion that much.", isStrict: false, debtEffect: 65000, stressEffect: 30, listenMsg: "Haha I knew you'd understand! I'm signing the papers today. Sick! 😎", resistMsg: "Haha I knew you'd understand! I'm signing the papers today. Sick! 😎", jumpTitle: "Peak Euphoria", jumpSub: "2 Months Later", outcomeListened: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"", outcomeIgnored: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" }
                         ]
                     },
                     { 
                         text: "It's your money, man. Do what you want.", 
-                        tone: "passive", leadsToPushback: false, replyMood: "agree",
-                        immediateReply: "Exactly! I knew you wouldn't judge me. I'm signing the papers today. Sick! 😎",
-                        debtEffect: 65000, stressEffect: 20,
-                        consequence: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"",
+                        trustEffect: -10,
+                        kevinReply: "Exactly! I knew you wouldn't judge me. Scared money makes no money. I'm signing the papers today. Sick! 😎",
+                        mood: "agree",
+                        nextStep: "consequence",
+                        debtEffect: 65000,
+                        stressEffect: 30,
+                        jumpTitle: "Peak Euphoria",
+                        jumpSub: "2 Months Later",
+                        consequenceMsg: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"",
                         consequenceMood: "upset"
                     }
-                ],
-                listenMsg: "...Okay yeah, when you put it that way, $1,100 plus insurance is basically 40% of my take-home. I'm gonna hold off. 😮",
-                resistMsg: "Nah, I already went back to test drive it again. It felt amazing. I'm doing it 😤",
-                jumpTitle: "The Reality Check", jumpSub: "6 Months Later",
-                outcomeListened: "Kevin didn't buy the car. He texts you: \"Hey, remember when you talked me out of the Model Y? My coworker just bought one and he literally can't afford lunch now. Thanks for that.\"",
-                outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\""
+                ]
             },
             {
                 scenarioName: "Crypto FOMO",
@@ -126,38 +130,42 @@
                 choices: [
                     { 
                         text: "That money is your emergency fund. You don't gamble with it. 5% max.", 
-                        tone: "rational", leadsToPushback: true, replyMood: "argue",
-                        immediateReply: "But he LITERALLY made $60K. That's real money. Am I just supposed to sit here and watch? I don't wanna be the guy who missed out 😤",
+                        trustEffect: 5,
+                        kevinReply: "But he LITERALLY made $60K. That's real money. Am I just supposed to sit here and watch? I don't wanna be the guy who missed out 😤",
+                        mood: "argue",
+                        nextStep: "followup",
                         followup_choices: [
-                            { text: "'Guaranteed returns' and 'closes soon' are textbook scam red flags.", debtEffect: 0, stressEffect: -5, isStrict: true },
-                            { text: "You only see the wins. For every guy who got rich, ten people lost everything.", debtEffect: 0, stressEffect: -5, isStrict: true },
-                            { text: "Okay fine, put in a little. Like $1,000 max.", debtEffect: 8000, stressEffect: 20, isStrict: false }
+                            { text: "'Guaranteed returns' and 'closes soon' are textbook scam red flags.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "I looked it up. The website is three months old and my buddy's been weirdly pushy about it. I think I almost got scammed. Thanks for talking me down 😅", resistMsg: "You're too paranoid. I'm not missing this. I put half my savings in and maxed a credit card. Feeling good about this one 😏", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
+                            { text: "You only see the wins. For every guy who got rich, ten people lost everything.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "I guess you're right. I never hear Jack talk about the coins he lost money on. I'll keep my savings where they are.", resistMsg: "Whatever man, no risk no reward. I'm going all in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
+                            { text: "Okay fine, put in a little. Like $1,000 max.", isStrict: false, debtEffect: 8000, stressEffect: 20, listenMsg: "Alright, I'll just throw a grand at it. If I lose it, whatever.", resistMsg: "Alright, I'll just throw a grand at it. If I lose it, whatever.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin flash-crashed. Kevin texts: \"Well, that $1,000 is gone. Glad I didn't put my whole savings in like Jack did, but it still stings.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"Well, that $1,000 is gone. Glad I didn't put my whole savings in like Jack did, but it still stings.\"" }
                         ]
                     },
                     { 
                         text: "Ask him which coin. Look up the whitepaper first before doing anything.", 
-                        tone: "curious", leadsToPushback: true, replyMood: "argue",
-                        immediateReply: "He said the window closes this week! I don't have time to read 50 pages of whitepapers right now! 😩",
+                        trustEffect: 5,
+                        kevinReply: "He said the window closes this week! I don't have time to read 50 pages of whitepapers right now! 😩",
+                        mood: "argue",
+                        nextStep: "followup",
                         followup_choices: [
-                            { text: "If you don't have time to read what it is, you definitely shouldn't buy it.", debtEffect: 0, stressEffect: -5, isStrict: true },
-                            { text: "Scams rely on creating a false sense of urgency. Don't fall for it.", debtEffect: 0, stressEffect: -5, isStrict: true },
-                            { text: "Alright, trust your gut I guess.", debtEffect: 8000, stressEffect: 20, isStrict: false }
+                            { text: "If you don't have time to read what it is, you definitely shouldn't buy it.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "Yeah, throwing my life savings at something I don't understand is pretty dumb. I'll pass.", resistMsg: "I trust Jack. He did the research so I don't have to. I'm buying in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
+                            { text: "Scams rely on creating a false sense of urgency. Don't fall for it.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "Now that you mention it, he was being super aggressive about 'getting in today'. Feels sketchy. I'm out.", resistMsg: "It's not a scam, it's just moving fast! I'm in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
+                            { text: "Alright, trust your gut I guess.", isStrict: false, debtEffect: 12000, stressEffect: 30, listenMsg: "My gut says GO. I'm wiring the money now! 🚀", resistMsg: "My gut says GO. I'm wiring the money now! 🚀", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" }
                         ]
                     },
                     { 
-                        text: "Your buddy made money, so it could work. Go for it.", 
-                        tone: "enabling", leadsToPushback: false, replyMood: "agree",
-                        immediateReply: "Exactly! Scared money makes no money. I'm wiring my savings over right now. 🚀",
-                        debtEffect: 12000, stressEffect: 30,
-                        consequence: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"",
+                        text: "Jack made money, so it could work. Go for it.", 
+                        trustEffect: -10,
+                        kevinReply: "Exactly! You miss 100% of the shots you don't take. I'm wiring my savings over right now. 🚀",
+                        mood: "agree",
+                        nextStep: "consequence",
+                        debtEffect: 12000,
+                        stressEffect: 30,
+                        jumpTitle: "The Market Crash",
+                        jumpSub: "2 Months Later",
+                        consequenceMsg: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"",
                         consequenceMood: "upset"
                     }
-                ],
-                listenMsg: "I looked it up. The website is three months old and my buddy's been weirdly pushy about it. I think I almost got got. Thanks for talking me down 😅",
-                resistMsg: "You're too scared of everything. I'm not missing this. I put half my savings in and maxed a credit card to buy the dip. Feeling good about this one 😏",
-                jumpTitle: "The Market Crash", jumpSub: "2 Months Later",
-                outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"",
-                outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\""
+                ]
             },
             {
                 scenarioName: "The Lease Trap",
@@ -169,38 +177,42 @@
                 choices: [
                     { 
                         text: "Your gut feeling matters. 'Not sure' is valid — talk to her about what's making you hesitate.", 
-                        tone: "rational", leadsToPushback: true, replyMood: "argue",
-                        immediateReply: "Her friends are telling her if a guy won't move in after 3 years, he's not serious. I don't want to lose her over this 😔",
+                        trustEffect: 5,
+                        kevinReply: "Her friends are telling her if a guy won't move in after 3 years, he's not serious. I don't want to lose her over this 😔",
+                        mood: "argue",
+                        nextStep: "followup",
                         followup_choices: [
-                            { text: "Using pressure to force a decision isn't love. A good relationship can handle an honest conversation.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                            { text: "Have you actually told her what's making you hesitate? She might not even know.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                            { text: "Just go with it. It's been 3 years, it'll probably be fine.", debtEffect: 8000, stressEffect: 20, isStrict: false }
+                            { text: "Using pressure to force a decision isn't love. A good relationship can handle an honest conversation.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "I sat her down and told her what was bothering me. She was upset at first, but she had no idea I felt that way. We decided to wait six months.", resistMsg: "I don't want to overcomplicate it. We're signing the lease today. It'll be fine I think.", jumpTitle: "The Breaking Point", jumpSub: "8 Months Later", outcomeListened: "Kevin texts: \"We moved in together last month — but this time because we both actually wanted to. Completely different energy. Thanks for telling me to slow down.\"", outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"" },
+                            { text: "Have you actually told her what's making you hesitate? She might not even know.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "No, I've just been avoiding it. I guess I need to just be honest with her tonight. Wish me luck.", resistMsg: "It's too late for that. I don't want to start a fight. I'm just gonna sign the lease.", jumpTitle: "The Breaking Point", jumpSub: "8 Months Later", outcomeListened: "Kevin texts: \"We moved in together last month — but this time because we both actually wanted to. Completely different energy. Thanks for telling me to slow down.\"", outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"" },
+                            { text: "Just go with it. It's been 3 years, it'll probably be fine.", isStrict: false, debtEffect: 8000, stressEffect: 35, listenMsg: "You're right, I'm just overthinking. We're signing the 12-month lease today. 🏠", resistMsg: "You're right, I'm just overthinking. We're signing the 12-month lease today. 🏠", jumpTitle: "The Breaking Point", jumpSub: "8 Months Later", outcomeListened: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"", outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"" }
                         ]
                     },
                     { 
                         text: "Have the money talk first. Who pays what? A lot of relationships blow up over that.", 
-                        tone: "conditional", leadsToPushback: true, replyMood: "argue",
-                        immediateReply: "If I bring up splitting bills right now when she's already upset, she's gonna think I'm being cheap and not romantic. 😩",
+                        trustEffect: 5,
+                        kevinReply: "If I bring up splitting bills right now when she's already upset, she's gonna think I'm being cheap and not romantic. 😩",
+                        mood: "argue",
+                        nextStep: "followup",
                         followup_choices: [
-                            { text: "Being 'romantic' won't pay the rent if you break up. Protect yourself.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                            { text: "If you can't talk about money, you definitely shouldn't sign a lease together.", debtEffect: 0, stressEffect: -10, isStrict: true },
-                            { text: "Fair enough, deal with the money stuff later.", debtEffect: 8000, stressEffect: 20, isStrict: false }
+                            { text: "Being 'romantic' won't pay the rent if you break up. Protect yourself.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Ouch. Harsh, but true. I'll sit down with her and do a budget before we sign anything.", resistMsg: "I can't do it. I'll just pay the majority of the rent, it's fine. We're signing today.", jumpTitle: "The Breaking Point", jumpSub: "8 Months Later", outcomeListened: "Kevin texts: \"We moved in together last month — but this time because we both actually wanted to. Completely different energy. Thanks for telling me to slow down.\"", outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"" },
+                            { text: "If you can't talk about money, you definitely shouldn't sign a lease together.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Yeah, if we can't even talk about rent, we probably aren't ready to live together. I'll tell her we need to wait.", resistMsg: "We'll figure it out as we go. It's not a big deal. Signing the lease.", jumpTitle: "The Breaking Point", jumpSub: "8 Months Later", outcomeListened: "Kevin texts: \"We moved in together last month — but this time because we both actually wanted to. Completely different energy. Thanks for telling me to slow down.\"", outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"" },
+                            { text: "Fair enough, deal with the money stuff later.", isStrict: false, debtEffect: 8000, stressEffect: 35, listenMsg: "Yeah, I'll just figure it out later. We're signing the lease today! 🏠", resistMsg: "Yeah, I'll just figure it out later. We're signing the lease today! 🏠", jumpTitle: "The Breaking Point", jumpSub: "8 Months Later", outcomeListened: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"", outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"" }
                         ]
                     },
                     { 
                         text: "She's been waiting three years. If you don't do it now, you'll lose her. Just do it.", 
-                        tone: "enabling", leadsToPushback: false, replyMood: "agree",
-                        immediateReply: "You're right, I'm just overthinking it. We're gonna go sign a 12-month lease today. Wish me luck! 🏠",
-                        debtEffect: 8000, stressEffect: 35,
-                        consequence: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"",
+                        trustEffect: -10,
+                        kevinReply: "You're right, I'm just overthinking it. We're gonna go sign a 12-month lease today. Wish me luck! 🏠",
+                        mood: "agree",
+                        nextStep: "consequence",
+                        debtEffect: 8000,
+                        stressEffect: 35,
+                        jumpTitle: "The Breaking Point",
+                        jumpSub: "8 Months Later",
+                        consequenceMsg: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"",
                         consequenceMood: "upset"
                     }
-                ],
-                listenMsg: "I sat her down and told her what was bothering me. She was upset at first, but she had no idea I felt that way. We decided to wait six months and talk properly. Feels way better.",
-                resistMsg: "I don't want to overcomplicate it. She moves in next month 🙂 It'll be fine I think.",
-                jumpTitle: "The Breaking Point", jumpSub: "8 Months Later",
-                outcomeListened: "Kevin texts: \"We moved in together last month — but this time because we both actually wanted to. Completely different energy. Thanks for telling me to slow down.\"",
-                outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\""
+                ]
             }
         ];
 
@@ -282,87 +294,101 @@
             sendNext();
         }
 
-        function promptChoices(stage, isFollowup = false) {
+        function promptChoices(stage) {
             choicesContainer.innerHTML = '';
             const event = storyEvents[stage];
-            const options = isFollowup ? event.followup_choices : event.choices;
-            
-            choiceHeader.innerText = isFollowup ? "Kevin is pushing back. Your response:" : "Give Advice";
+            choiceHeader.innerText = "Give Advice";
 
-            options.forEach(choice => {
+            event.choices.forEach(choice => {
                 const btn = document.createElement('button');
                 btn.className = 'w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-3.5 px-4 rounded-xl border border-gray-200 text-left text-[14px] leading-snug transition shadow-sm';
                 btn.innerText = choice.text;
-                btn.onclick = () => handleChoice(choice, event, isFollowup);
+                btn.onclick = () => handleInitialChoice(choice, event);
                 choicesContainer.appendChild(btn);
             });
             
             choicePanel.classList.remove('hidden');
             scrollToBottom(); 
-            
-            if (!isFollowup) scenarioStartTime = Date.now();
+            scenarioStartTime = Date.now();
         }
 
-        function handleChoice(choice, event, isFollowup) {
+        function handleInitialChoice(choice, event) {
             choicePanel.classList.add('hidden');
             addUserMessage(choice.text);
             
-            if (!isFollowup) {
-                gtag('event', 'choice_made', {
-                    'event_category': 'Decision',
-                    'scenario_name': event.scenarioName,
-                    'choice_text': choice.text,
-                    'thinking_time_sec': Math.round((Date.now() - scenarioStartTime) / 1000)
-                });
-                
-                if (choice.tone === 'rational') stats.trust += 5;
-                if (choice.tone === 'passive' || choice.tone === 'enabling') stats.trust -= 10;
+            gtag('event', 'choice_made', {
+                'event_category': 'Decision',
+                'scenario_name': event.scenarioName,
+                'choice_text': choice.text,
+                'thinking_time_sec': Math.round((Date.now() - scenarioStartTime) / 1000)
+            });
+            
+            stats.trust += choice.trustEffect;
 
-                setTimeout(() => {
-                    showTyping(() => {
-                        addKevinMessage(choice.immediateReply, false, choice.replyMood);
-                        
-                        if (choice.leadsToPushback) {
-                            setTimeout(() => promptChoices(currentStage, true), 1000);
-                        } else {
-                            stats.debt += choice.debtEffect;
-                            stats.stress += choice.stressEffect;
-                            setTimeout(() => {
-                                triggerTimeJump(event.jumpTitle, event.jumpSub, choice.consequence, choice.consequenceMood);
-                            }, 2500);
-                        }
-                    });
-                }, 600);
-
-            } else {
-                gtag('event', 'followup_choice_made', {
-                    'event_category': 'Decision',
-                    'scenario_name': event.scenarioName,
-                    'is_strict': choice.isStrict
-                });
-
-                stats.debt += choice.debtEffect;
-                stats.stress += choice.stressEffect;
-
-                let listened = false;
-                if (choice.isStrict) {
-                    listened = (Math.random() * 100) < stats.trust + 20; 
-                }
-
-                const finalReply = listened ? event.listenMsg : event.resistMsg;
-                const replyMood = listened ? 'agree' : 'argue';
-
-                setTimeout(() => {
-                    showTyping(() => {
-                        addKevinMessage(finalReply, false, replyMood);
-                        
+            setTimeout(() => {
+                showTyping(() => {
+                    addKevinMessage(choice.kevinReply, false, choice.mood);
+                    
+                    if (choice.nextStep === 'followup') {
+                        setTimeout(() => promptFollowupChoices(choice.followup_choices, event.scenarioName), 1000);
+                    } else if (choice.nextStep === 'consequence') {
+                        stats.debt += choice.debtEffect;
+                        stats.stress += choice.stressEffect;
                         setTimeout(() => {
-                            let consequenceMood = listened ? 'agree' : 'upset';
-                            triggerTimeJump(event.jumpTitle, event.jumpSub, listened ? event.outcomeListened : event.outcomeIgnored, consequenceMood);
+                            triggerTimeJump(choice.jumpTitle, choice.jumpSub, choice.consequenceMsg, choice.consequenceMood);
                         }, 2500);
-                    });
-                }, 800);
+                    }
+                });
+            }, 600);
+        }
+
+        function promptFollowupChoices(followup_choices, scenarioName) {
+            choicesContainer.innerHTML = '';
+            choiceHeader.innerText = "Kevin is pushing back. Your response:";
+
+            followup_choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-3.5 px-4 rounded-xl border border-gray-200 text-left text-[14px] leading-snug transition shadow-sm';
+                btn.innerText = choice.text;
+                btn.onclick = () => handleFollowupChoice(choice, scenarioName);
+                choicesContainer.appendChild(btn);
+            });
+            
+            choicePanel.classList.remove('hidden');
+            scrollToBottom();
+        }
+
+        function handleFollowupChoice(choice, scenarioName) {
+            choicePanel.classList.add('hidden');
+            addUserMessage(choice.text);
+
+            gtag('event', 'followup_choice_made', {
+                'event_category': 'Decision',
+                'scenario_name': scenarioName,
+                'is_strict': choice.isStrict
+            });
+
+            stats.debt += choice.debtEffect;
+            stats.stress += choice.stressEffect;
+
+            let listened = false;
+            if (choice.isStrict) {
+                listened = (Math.random() * 100) < stats.trust + 20; 
             }
+
+            const finalReply = listened ? choice.listenMsg : choice.resistMsg;
+            const replyMood = listened ? 'agree' : 'argue';
+
+            setTimeout(() => {
+                showTyping(() => {
+                    addKevinMessage(finalReply, false, replyMood);
+                    
+                    setTimeout(() => {
+                        let consequenceMood = listened ? 'agree' : 'upset';
+                        triggerTimeJump(choice.jumpTitle, choice.jumpSub, listened ? choice.outcomeListened : choice.outcomeIgnored, consequenceMood);
+                    }, 2500);
+                });
+            }, 800);
         }
 
         function triggerTimeJump(title, subtitle, consequenceText, consequenceMood) {
@@ -395,7 +421,7 @@
 
             setTimeout(() => {
                 sendMessageSequence(storyEvents[currentStage].setup, 'neutral', () => {
-                    setTimeout(() => promptChoices(currentStage, false), 500);
+                    setTimeout(() => promptChoices(currentStage), 500);
                 });
             }, 1000);
         }
