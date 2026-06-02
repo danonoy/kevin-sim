@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kevin Life Simulator v3.0</title>
+    <title>Kevin Life Simulator v3.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
@@ -72,7 +72,6 @@
         let scenarioStartTime = 0; 
         let currentEndingType = ''; 
 
-        // Smart Branching Story Logic
         const storyEvents = [
             {
                 scenarioName: "The Car (Status Anxiety)",
@@ -84,10 +83,8 @@
                 choices: [
                     { 
                         text: "That's a terrible idea right now. Save up a real down payment first.", 
-                        tone: "rational",
-                        leadsToPushback: true,
+                        tone: "rational", leadsToPushback: true, replyMood: "argue",
                         immediateReply: "You always just lecture me. You don't understand what it feels like to be looked down on. I can make it work 😤",
-                        replyMood: "argue",
                         followup_choices: [
                             { text: "$1,100 x 72 months. You have $8K saved. Do the math, Kevin.", debtEffect: 0, stressEffect: -10, isStrict: true },
                             { text: "Real friends aren't gonna respect you more because of a car.", debtEffect: 0, stressEffect: -10, isStrict: true },
@@ -95,11 +92,19 @@
                         ]
                     },
                     { 
-                        text: "You only live once! Do it. You gotta look the part to get the part.", 
-                        tone: "enabling",
-                        leadsToPushback: false,
-                        immediateReply: "Haha I knew you'd get it! I'm signing the papers today. Sick! 😎",
-                        replyMood: "agree",
+                        text: "Get a used EV instead. Same vibe, way less financial damage.", 
+                        tone: "compromise", leadsToPushback: true, replyMood: "argue",
+                        immediateReply: "A used EV? Come on, Jack pulled up in a Porsche. I can't show up in a used Leaf. It has to be the new Model Y. 😩",
+                        followup_choices: [
+                            { text: "Don't go broke trying to impress Jack. Buy what you can actually afford.", debtEffect: 0, stressEffect: -10, isStrict: true },
+                            { text: "A used Tesla still looks new to most people. Save your cash.", debtEffect: 0, stressEffect: -10, isStrict: true },
+                            { text: "Whatever, get the new one if you care about Jack's opinion that much.", debtEffect: 65000, stressEffect: 30, isStrict: false }
+                        ]
+                    },
+                    { 
+                        text: "It's your money, man. Do what you want.", 
+                        tone: "passive", leadsToPushback: false, replyMood: "agree",
+                        immediateReply: "Exactly! I knew you wouldn't judge me. I'm signing the papers today. Sick! 😎",
                         debtEffect: 65000, stressEffect: 20,
                         consequence: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"",
                         consequenceMood: "upset"
@@ -107,8 +112,7 @@
                 ],
                 listenMsg: "...Okay yeah, when you put it that way, $1,100 plus insurance is basically 40% of my take-home. I'm gonna hold off. 😮",
                 resistMsg: "Nah, I already went back to test drive it again. It felt amazing. I'm doing it 😤",
-                jumpTitle: "The Reality Check",
-                jumpSub: "6 Months Later",
+                jumpTitle: "The Reality Check", jumpSub: "6 Months Later",
                 outcomeListened: "Kevin didn't buy the car. He texts you: \"Hey, remember when you talked me out of the Model Y? My coworker just bought one and he literally can't afford lunch now. Thanks for that.\"",
                 outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\""
             },
@@ -122,10 +126,8 @@
                 choices: [
                     { 
                         text: "That money is your emergency fund. You don't gamble with it. 5% max.", 
-                        tone: "rational",
-                        leadsToPushback: true,
+                        tone: "rational", leadsToPushback: true, replyMood: "argue",
                         immediateReply: "But he LITERALLY made $60K. That's real money. Am I just supposed to sit here and watch? I don't wanna be the guy who missed out 😤",
-                        replyMood: "argue",
                         followup_choices: [
                             { text: "'Guaranteed returns' and 'closes soon' are textbook scam red flags.", debtEffect: 0, stressEffect: -5, isStrict: true },
                             { text: "You only see the wins. For every guy who got rich, ten people lost everything.", debtEffect: 0, stressEffect: -5, isStrict: true },
@@ -133,11 +135,19 @@
                         ]
                     },
                     { 
-                        text: "Jack made money, so it could work. Scared money makes no money. Go for it.", 
-                        tone: "enabling",
-                        leadsToPushback: false,
-                        immediateReply: "Exactly! You miss 100% of the shots you don't take. I'm wiring my savings over right now. 🚀",
-                        replyMood: "agree",
+                        text: "Ask him which coin. Look up the whitepaper first before doing anything.", 
+                        tone: "curious", leadsToPushback: true, replyMood: "argue",
+                        immediateReply: "He said the window closes this week! I don't have time to read 50 pages of whitepapers right now! 😩",
+                        followup_choices: [
+                            { text: "If you don't have time to read what it is, you definitely shouldn't buy it.", debtEffect: 0, stressEffect: -5, isStrict: true },
+                            { text: "Scams rely on creating a false sense of urgency. Don't fall for it.", debtEffect: 0, stressEffect: -5, isStrict: true },
+                            { text: "Alright, trust your gut I guess.", debtEffect: 8000, stressEffect: 20, isStrict: false }
+                        ]
+                    },
+                    { 
+                        text: "Your buddy made money, so it could work. Go for it.", 
+                        tone: "enabling", leadsToPushback: false, replyMood: "agree",
+                        immediateReply: "Exactly! Scared money makes no money. I'm wiring my savings over right now. 🚀",
                         debtEffect: 12000, stressEffect: 30,
                         consequence: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"",
                         consequenceMood: "upset"
@@ -145,8 +155,7 @@
                 ],
                 listenMsg: "I looked it up. The website is three months old and my buddy's been weirdly pushy about it. I think I almost got got. Thanks for talking me down 😅",
                 resistMsg: "You're too scared of everything. I'm not missing this. I put half my savings in and maxed a credit card to buy the dip. Feeling good about this one 😏",
-                jumpTitle: "The Market Crash",
-                jumpSub: "2 Months Later",
+                jumpTitle: "The Market Crash", jumpSub: "2 Months Later",
                 outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"",
                 outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\""
             },
@@ -159,11 +168,9 @@
                 ],
                 choices: [
                     { 
-                        text: "Your gut feeling matters. 'Not sure' is valid — talk to her about what's actually making you hesitate.", 
-                        tone: "rational",
-                        leadsToPushback: true,
+                        text: "Your gut feeling matters. 'Not sure' is valid — talk to her about what's making you hesitate.", 
+                        tone: "rational", leadsToPushback: true, replyMood: "argue",
                         immediateReply: "Her friends are telling her if a guy won't move in after 3 years, he's not serious. I don't want to lose her over this 😔",
-                        replyMood: "argue",
                         followup_choices: [
                             { text: "Using pressure to force a decision isn't love. A good relationship can handle an honest conversation.", debtEffect: 0, stressEffect: -10, isStrict: true },
                             { text: "Have you actually told her what's making you hesitate? She might not even know.", debtEffect: 0, stressEffect: -10, isStrict: true },
@@ -171,11 +178,19 @@
                         ]
                     },
                     { 
+                        text: "Have the money talk first. Who pays what? A lot of relationships blow up over that.", 
+                        tone: "conditional", leadsToPushback: true, replyMood: "argue",
+                        immediateReply: "If I bring up splitting bills right now when she's already upset, she's gonna think I'm being cheap and not romantic. 😩",
+                        followup_choices: [
+                            { text: "Being 'romantic' won't pay the rent if you break up. Protect yourself.", debtEffect: 0, stressEffect: -10, isStrict: true },
+                            { text: "If you can't talk about money, you definitely shouldn't sign a lease together.", debtEffect: 0, stressEffect: -10, isStrict: true },
+                            { text: "Fair enough, deal with the money stuff later.", debtEffect: 8000, stressEffect: 20, isStrict: false }
+                        ]
+                    },
+                    { 
                         text: "She's been waiting three years. If you don't do it now, you'll lose her. Just do it.", 
-                        tone: "enabling",
-                        leadsToPushback: false,
+                        tone: "enabling", leadsToPushback: false, replyMood: "agree",
                         immediateReply: "You're right, I'm just overthinking it. We're gonna go sign a 12-month lease today. Wish me luck! 🏠",
-                        replyMood: "agree",
                         debtEffect: 8000, stressEffect: 35,
                         consequence: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\"",
                         consequenceMood: "upset"
@@ -183,8 +198,7 @@
                 ],
                 listenMsg: "I sat her down and told her what was bothering me. She was upset at first, but she had no idea I felt that way. We decided to wait six months and talk properly. Feels way better.",
                 resistMsg: "I don't want to overcomplicate it. She moves in next month 🙂 It'll be fine I think.",
-                jumpTitle: "The Breaking Point",
-                jumpSub: "8 Months Later",
+                jumpTitle: "The Breaking Point", jumpSub: "8 Months Later",
                 outcomeListened: "Kevin texts: \"We moved in together last month — but this time because we both actually wanted to. Completely different energy. Thanks for telling me to slow down.\"",
                 outcomeIgnored: "Kevin texts: \"We broke up. Turns out we had problems we never dealt with. But we signed a 12-month lease, she moved out, and I'm stuck paying $3,200 rent alone. I'm drowning.\""
             }
@@ -302,17 +316,15 @@
                 });
                 
                 if (choice.tone === 'rational') stats.trust += 5;
-                if (choice.tone === 'enabling') stats.trust -= 10;
+                if (choice.tone === 'passive' || choice.tone === 'enabling') stats.trust -= 10;
 
                 setTimeout(() => {
                     showTyping(() => {
                         addKevinMessage(choice.immediateReply, false, choice.replyMood);
                         
                         if (choice.leadsToPushback) {
-                            // Phase 2: Pushback
                             setTimeout(() => promptChoices(currentStage, true), 1000);
                         } else {
-                            // Skipped Pushback (Enabling path) -> Straight to consequence
                             stats.debt += choice.debtEffect;
                             stats.stress += choice.stressEffect;
                             setTimeout(() => {
@@ -323,7 +335,6 @@
                 }, 600);
 
             } else {
-                // Phase 2: Final decision
                 gtag('event', 'followup_choice_made', {
                     'event_category': 'Decision',
                     'scenario_name': event.scenarioName,
