@@ -64,18 +64,14 @@
         const choicesContainer = document.getElementById('choices-container');
         const timeJump = document.getElementById('time-jump');
         
-        let stats = {
-            trust: 50,    
-            stress: 50,   
-            debt: 0       
-        };
-
+        let stats = { trust: 50, stress: 50, debt: 0 };
         let currentStage = 0;
+        let scenarioStartTime = 0; // 用來計算思考時間
+        let currentEndingType = ''; // 紀錄最終結局狀態
 
-        // Scenarios
         const storyEvents = [
             {
-                // Scenario 1: The Car
+                scenarioName: "The Car (Status Anxiety)",
                 setup: [
                     "Work is stressing me out so much lately. My boss is a nightmare.",
                     "Went to a college reunion yesterday. Everyone's doing so well. Jack literally pulled up in a Porsche.",
@@ -107,7 +103,7 @@
                 ]
             },
             {
-                // Scenario 2: Crypto FOMO
+                scenarioName: "Crypto FOMO",
                 setup: [
                     "Hey, gotta tell you something.",
                     "Jack tipped me off on this new crypto coin. It literally tripled in a month.",
@@ -141,7 +137,7 @@
                 ]
             },
             {
-                // Scenario 3: BNPL Trap
+                scenarioName: "BNPL Trap (Lifestyle Creep)",
                 setup: [
                     "So, I found this gorgeous designer watch. It's normally $4,500.",
                     "But the store has this zero-interest Buy Now Pay Later plan. It's literally only $125 a month!",
@@ -253,16 +249,23 @@
             
             choicePanel.classList.remove('hidden');
             scrollToBottom(); 
+            
+            // 開始計算思考時間
+            scenarioStartTime = Date.now();
         }
 
         function handleChoice(choice, event) {
             choicePanel.classList.add('hidden');
             addUserMessage(choice.text);
             
+            // 計算精準的思考時間 (秒)
+            let thinkingTimeSeconds = Math.round((Date.now() - scenarioStartTime) / 1000);
+            
             gtag('event', 'choice_made', {
                 'event_category': 'Decision',
-                'stage': currentStage + 1,
-                'choice_text': choice.text
+                'scenario_name': event.scenarioName,
+                'choice_text': choice.text,
+                'thinking_time_sec': thinkingTimeSeconds
             });
             
             if(choice.trustEffect) stats.trust += choice.trustEffect;
@@ -274,7 +277,6 @@
             setTimeout(() => {
                 showTyping(() => {
                     addKevinMessage(finalReply);
-                    
                     setTimeout(() => {
                         triggerTimeJump(choice.jumpTitle, choice.jumpSub, choice.consequence);
                     }, 2500);
@@ -289,7 +291,6 @@
             
             setTimeout(() => {
                 timeJump.classList.add('hidden');
-                
                 setTimeout(() => {
                     if(consequence) {
                         showTyping(() => {
@@ -318,7 +319,7 @@
         function runStage() {
             gtag('event', 'scenario_reached', {
                 'event_category': 'Progress',
-                'stage_number': currentStage + 1
+                'scenario_name': storyEvents[currentStage].scenarioName
             });
 
             setTimeout(() => {
@@ -332,6 +333,7 @@
             setTimeout(() => {
                 let endingMsg = [];
                 if (stats.debt > 50000) {
+                    currentEndingType = 'ending_crashed';
                     endingMsg = [
                         "Hey man, are you there?",
                         "I am completely drowning.",
@@ -340,6 +342,7 @@
                         "They're repossessing the car tomorrow. I don't know what to do..."
                     ];
                 } else if (stats.stress > 60) {
+                    currentEndingType = 'ending_struggling';
                     endingMsg = [
                         "Hey...",
                         "Things got really tight this month.",
@@ -347,6 +350,7 @@
                         "I'm constantly stressed out about making rent. Feels like I'm one mistake away from ruin."
                     ];
                 } else {
+                    currentEndingType = 'ending_saved';
                     endingMsg = [
                         "Hey!",
                         "Crazy year. A lot of my friends got laid off and went into debt.",
@@ -367,11 +371,9 @@
             choicePanel.classList.add('hidden');
             choicesContainer.innerHTML = '';
 
-            let endingTypeString = '';
             let endingHtml = '';
 
-            if (stats.debt > 40000 || stats.stress > 75) {
-                endingTypeString = 'Crashed';
+            if (currentEndingType === 'ending_crashed') {
                 endingHtml = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">💀</div>
@@ -381,8 +383,7 @@
                         </div>
                     </div>
                 `;
-            } else if (stats.trust > 60) {
-                endingTypeString = 'Saved';
+            } else if (currentEndingType === 'ending_saved') {
                 endingHtml = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">🛟</div>
@@ -393,7 +394,6 @@
                     </div>
                 `;
             } else {
-                endingTypeString = 'Surviving';
                 endingHtml = `
                     <div class="text-center space-y-4">
                         <div class="text-6xl mb-4">😶</div>
@@ -405,9 +405,9 @@
                 `;
             }
 
-            gtag('event', 'game_complete', {
+            // 發送精準的結局事件
+            gtag('event', currentEndingType, {
                 'event_category': 'Completion',
-                'ending_type': endingTypeString,
                 'final_debt': stats.debt,
                 'final_stress': stats.stress,
                 'final_trust': stats.trust
@@ -448,7 +448,11 @@
         }
 
         function handleReplay() {
-            gtag('event', 'game_replay', { 'event_category': 'Engagement' });
+            // 紀錄玩家是因為哪個結局而不甘心重玩的
+            gtag('event', 'restart_game', { 
+                'event_category': 'Engagement',
+                'replayed_from': currentEndingType
+            });
             setTimeout(() => { location.reload(); }, 250);
         }
 
