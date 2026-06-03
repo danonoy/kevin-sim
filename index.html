@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kevin Life Simulator v3.4</title>
+    <title>Kevin Life Simulator v3.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
@@ -71,6 +71,7 @@
         let scenarioStartTime = 0; 
         let currentEndingType = ''; 
 
+        // v3.5 Story Logic: Emotionally Manipulative & High-Stakes
         const storyEvents = [
             {
                 scenarioName: "The Car (Status Anxiety)",
@@ -82,10 +83,9 @@
                 choices: [
                     { 
                         text: "That's a terrible idea right now. Save up a real down payment first.", 
-                        trustEffect: 5,
+                        trustEffect: 5, intervention_level: "high",
                         kevinReply: "You always just lecture me. You don't understand what it feels like to be looked down on. I can make it work 😤",
-                        mood: "argue", // Red background for strict pushback
-                        nextStep: "followup",
+                        mood: "argue", nextStep: "followup",
                         followup_choices: [
                             { text: "$1,100 x 72 months. You have barely any savings. Do the math, Kevin.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Okay yeah, when you put it that way... $1,100 plus insurance is basically 40% of my take-home. I'm gonna hold off. 😮", resistMsg: "I don't care, I already went back to test drive it. It felt amazing. I'm doing it 😤", jumpTitle: "The Reality Check", jumpSub: "6 Months Later", outcomeListened: "Kevin didn't buy the car. He texts you: \"Hey, remember when you talked me out of the Model Y? My coworker just bought one and he literally can't afford lunch now. Thanks for that.\"", outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
                             { text: "Real friends aren't gonna respect you more because of a car.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Damn... you're probably right. If Jack cares about what car I drive, that's his problem. I'll stick with the Corolla for now.", resistMsg: "Easy for you to say. I'm tired of feeling like I'm falling behind. I'm buying it.", jumpTitle: "The Reality Check", jumpSub: "6 Months Later", outcomeListened: "Kevin didn't buy the car. He texts you: \"Hey, remember when you talked me out of the Model Y? My coworker just bought one and he literally can't afford lunch now. Thanks for that.\"", outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
@@ -94,10 +94,9 @@
                     },
                     { 
                         text: "Get a used EV instead. Same vibe, way less financial damage.", 
-                        trustEffect: 5,
+                        trustEffect: 5, intervention_level: "medium",
                         kevinReply: "A used EV? Come on, Jack pulled up in a Porsche. I can't show up in a used Leaf. It has to be the new Model Y. 😩",
-                        mood: "complain", // Yellow background for annoying complaints
-                        nextStep: "followup",
+                        mood: "complain", nextStep: "followup",
                         followup_choices: [
                             { text: "Don't go broke trying to impress Jack. Buy what you can actually afford.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Yeah... impressing Jack isn't worth going broke. I backed out and got a used Golf instead. It's fine.", resistMsg: "I'm not compromising on this. I want the new one and I'm getting it. 😤", jumpTitle: "A Modest Compromise", jumpSub: "2 Months Later", outcomeListened: "Kevin texts: \"The used car is fine. Not as flashy, but it gets me around and I'm not stressing over the payments at all.\"", outcomeIgnored: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
                             { text: "A used Tesla still looks brand new to most people. Save your cash.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Actually, you make a good point. Found a used 2021 model for way cheaper. Going with that instead.", resistMsg: "No, I want the newest tech. I'm signing for the brand new one today.", jumpTitle: "A Modest Compromise", jumpSub: "2 Months Later", outcomeListened: "Kevin texts: \"The used car is fine. Not as flashy, but it gets me around and I'm not stressing over the payments at all.\"", outcomeIgnored: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
@@ -106,14 +105,11 @@
                     },
                     { 
                         text: "It's your money, man. Do what you want.", 
-                        trustEffect: -10,
+                        trustEffect: -10, intervention_level: "give_up",
                         kevinReply: "Exactly! I knew you wouldn't judge me. Scared money makes no money. I'm signing the papers today. Sick! 😎",
-                        mood: "agree", // Green background for validation
-                        nextStep: "consequence",
-                        debtEffect: 65000,
-                        stressEffect: 30,
-                        jumpTitle: "Peak Euphoria",
-                        jumpSub: "2 Months Later",
+                        mood: "agree", nextStep: "consequence",
+                        debtEffect: 65000, stressEffect: 30,
+                        jumpTitle: "Peak Euphoria", jumpSub: "2 Months Later",
                         consequenceMsg: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"",
                         consequenceMood: "upset"
                     }
@@ -129,10 +125,9 @@
                 choices: [
                     { 
                         text: "That money is your emergency fund. You don't gamble with it. 5% max.", 
-                        trustEffect: 5,
+                        trustEffect: 5, intervention_level: "high",
                         kevinReply: "But he LITERALLY made $60K. That's real money. Am I just supposed to sit here and watch? I don't wanna be the guy who missed out 😤",
-                        mood: "argue", // Red background
-                        nextStep: "followup",
+                        mood: "argue", nextStep: "followup",
                         followup_choices: [
                             { text: "'Guaranteed returns' and 'closes soon' are textbook scam red flags.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "I looked it up. The website is three months old and my buddy's been weirdly pushy about it. I think I almost got scammed. Thanks for talking me down 😅", resistMsg: "You're too paranoid. I'm not missing this. I put half my savings in and maxed a credit card. Feeling good about this one 😏", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
                             { text: "You only see the wins. For every guy who got rich, ten people lost everything.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "I guess you're right. I never hear Jack talk about the coins he lost money on. I'll keep my savings where they are.", resistMsg: "Whatever man, no risk no reward. I'm going all in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
@@ -141,10 +136,9 @@
                     },
                     { 
                         text: "Ask him which coin. Look up the whitepaper first before doing anything.", 
-                        trustEffect: 5,
+                        trustEffect: 5, intervention_level: "medium",
                         kevinReply: "He said the window closes this week! I don't have time to read 50 pages of whitepapers right now! 😩",
-                        mood: "complain", // Yellow background
-                        nextStep: "followup",
+                        mood: "complain", nextStep: "followup",
                         followup_choices: [
                             { text: "If you don't have time to read what it is, you definitely shouldn't buy it.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "Yeah, throwing my life savings at something I don't understand is pretty dumb. I'll pass.", resistMsg: "I trust Jack. He did the research so I don't have to. I'm buying in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
                             { text: "Scams rely on creating a false sense of urgency. Don't fall for it.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "Now that you mention it, he was being super aggressive about 'getting in today'. Feels sketchy. I'm out.", resistMsg: "It's not a scam, it's just moving fast! I'm in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
@@ -153,62 +147,54 @@
                     },
                     { 
                         text: "Jack made money, so it could work. Go for it.", 
-                        trustEffect: -10,
+                        trustEffect: -10, intervention_level: "give_up",
                         kevinReply: "Exactly! You miss 100% of the shots you don't take. I'm wiring my savings over right now. 🚀",
-                        mood: "agree", // Green background
-                        nextStep: "consequence",
-                        debtEffect: 12000,
-                        stressEffect: 30,
-                        jumpTitle: "The Market Crash",
-                        jumpSub: "2 Months Later",
+                        mood: "agree", nextStep: "consequence",
+                        debtEffect: 12000, stressEffect: 30,
+                        jumpTitle: "The Market Crash", jumpSub: "2 Months Later",
                         consequenceMsg: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"",
                         consequenceMood: "upset"
                     }
                 ]
             },
             {
-                scenarioName: "The Guru Trap (Get Rich Quick)",
+                scenarioName: "The Influencer Trap (Quitting Job)",
                 setup: [
-                    "Dude, I am so sick of the 9-to-5 grind. I can't do this for the next 40 years. 😩",
-                    "I found this guy on TikTok. He makes like $30K a month dropshipping and traveling.",
-                    "He's opening up his private Mastermind group. It's $3,500. I'm gonna put it on my credit card. It's an investment in myself, right?"
+                    "Dude, my TikTok video just hit 50K views. People are loving my content. 🔥",
+                    "My boss is being a jerk anyway. I'm literally wasting my life at this 9-to-5.",
+                    "I just put an iPhone 16 Pro Max and a year of CapCut Pro on my credit card. I'm thinking about quitting tomorrow to go all-in."
                 ],
                 choices: [
                     { 
-                        text: "Those gurus make their money selling courses, not dropshipping. Don't go into debt for this.", 
-                        trustEffect: 5,
-                        kevinReply: "But he shows his Shopify dashboard! And if I try to figure it out myself, it'll take years. I'm losing money by NOT taking it! 😤",
-                        mood: "argue", // Red background
-                        nextStep: "followup",
+                        text: "Do NOT quit your job. 50K views pays zero dollars. Build your channel on the weekends.", 
+                        trustEffect: 5, intervention_level: "high",
+                        kevinReply: "I can't build it on weekends! I'm too tired after work! You just don't understand the creator economy 😤",
+                        mood: "argue", nextStep: "followup",
                         followup_choices: [
-                            { text: "There is no secret blueprint. It's designed to take your $3,500. Do not swipe that card.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Yeah... I reverse-searched his 'suppliers' and they're just public AliExpress links. You're right, he's just selling a dream. I'm out. 😮‍💨", resistMsg: "You're just projecting your own limits. I'm swiping the card. See you at the top. ✌️", jumpTitle: "The Hustle Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, I watched some free videos on that dropshipping stuff. The margins are terrible and it's super saturated. So glad I didn't give that scammer $3,500.\"", outcomeIgnored: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"" },
-                            { text: "If his dropshipping was actually making $30K a month, he wouldn't be begging people to buy his course.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Damn. That actually makes total sense. Why would he train his own competition? Okay, I'll keep my credit card in my wallet.", resistMsg: "He's just trying to give back to his followers! You don't get it. I'm joining the group.", jumpTitle: "The Hustle Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, I watched some free videos on that dropshipping stuff. The margins are terrible and it's super saturated. So glad I didn't give that scammer $3,500.\"", outcomeIgnored: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"" },
-                            { text: "Alright man, it's your credit score. Good luck with the dropshipping.", isStrict: false, debtEffect: 5500, stressEffect: 35, listenMsg: "Thanks for the support. I'm gonna crush this. 😎", resistMsg: "Thanks for the support. I'm gonna crush this. 😎", jumpTitle: "The Hustle Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"", outcomeIgnored: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"" }
+                            { text: "Credit card debt at 24% interest will destroy you before you get a single sponsorship.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Ugh. Fine. You're right. I can't pay rent with views. I'll just grind it out on weekends for now. 😮‍💨", resistMsg: "I'll pay it off when I go viral next month. Watch me. I'm sending my resignation right now. ✌️", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, the algorithm changed and I barely get 200 views a video now. Thank GOD I didn't quit my job. I would be homeless right now.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" },
+                            { text: "The algorithm changes every week. You are trading a steady paycheck for a lottery ticket.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Damn. Yeah... going viral once doesn't mean anything. I'll keep the day job and film after work.", resistMsg: "I have the formula figured out. I'm betting on myself! Resignation sent.", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, the algorithm changed and I barely get 200 views a video now. Thank GOD I didn't quit my job. I would be homeless right now.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" },
+                            { text: "Alright man, it's your credit score. Good luck with the videos.", isStrict: false, debtEffect: 15000, stressEffect: 35, listenMsg: "Thanks for the support. I'm gonna crush this. 😎", resistMsg: "Thanks for the support. I'm gonna crush this. 😎", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" }
                         ]
                     },
                     { 
-                        text: "Start with free YouTube tutorials. If you actually stick with it, then maybe consider a course.", 
-                        trustEffect: 5,
-                        kevinReply: "Free stuff is just basic garbage! This Mastermind gives you the exact blueprint and direct access to his suppliers. I need the fast track. 😩",
-                        mood: "complain", // Yellow background
-                        nextStep: "followup",
+                        text: "Ask your boss to drop down to part-time first. Don't rely on credit cards to survive.", 
+                        trustEffect: 5, intervention_level: "medium",
+                        kevinReply: "Part-time means I lose my health benefits! If I'm gonna do this, I have to burn the boats and commit 100%! 😩",
+                        mood: "complain", nextStep: "followup",
                         followup_choices: [
-                            { text: "If you aren't disciplined enough to learn for free, a $3,500 course won't fix your work ethic.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Ouch. Harsh, but true. Okay, I'll commit to watching free stuff for a month before I spend any money.", resistMsg: "It's not about work ethic, it's about getting the right info! I'm buying it.", jumpTitle: "The Hustle Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, I watched some free videos on that dropshipping stuff. The margins are terrible and it's super saturated. So glad I didn't give that scammer $3,500.\"", outcomeIgnored: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"" },
-                            { text: "There is no 'fast track' in business. Don't pay someone to skip the hard work.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "You're right. I'm just looking for an easy way out of my job. I'll save my money.", resistMsg: "I'm working smarter, not harder. Swiping the card today.", jumpTitle: "The Hustle Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, I watched some free videos on that dropshipping stuff. The margins are terrible and it's super saturated. So glad I didn't give that scammer $3,500.\"", outcomeIgnored: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"" },
-                            { text: "Fair enough. Just make sure you can afford the monthly payments on that card.", isStrict: false, debtEffect: 5500, stressEffect: 35, listenMsg: "I'll make the money back in a month anyway. Buying it now! 💸", resistMsg: "I'll make the money back in a month anyway. Buying it now! 💸", jumpTitle: "The Hustle Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"", outcomeIgnored: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"" }
+                            { text: "If you 'burn the boats' using high-interest debt, you will drown before you reach the island.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Ouch. Okay, that's fair. I'll just suck it up and edit videos at night until I actually make real money from it.", resistMsg: "You're just projecting your own limits. I'm taking the leap today.", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, the algorithm changed and I barely get 200 views a video now. Thank GOD I didn't quit my job. I would be homeless right now.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" },
+                            { text: "You literally cannot pay rent with TikTok likes. Save up a 6-month cash runway before you quit.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "You're right. I'm jumping the gun. I'll start saving aggressively and see if my channel is still growing by winter.", resistMsg: "By the time I save 6 months of cash, this trend will be over. I have to strike now!", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, the algorithm changed and I barely get 200 views a video now. Thank GOD I didn't quit my job. I would be homeless right now.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" },
+                            { text: "Whatever you think is best. Just make sure you can make the minimum payments.", isStrict: false, debtEffect: 15000, stressEffect: 35, listenMsg: "I'll make the money back in a month anyway. Quitting today! 💸", resistMsg: "I'll make the money back in a month anyway. Quitting today! 💸", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" }
                         ]
                     },
                     { 
-                        text: "You gotta spend money to make money. Bet on yourself and escape the rat race.", 
-                        trustEffect: -10,
-                        kevinReply: "Exactly! Everyone else is just too scared to take a risk. I'm buying the course right now. 🚀",
-                        mood: "agree", // Green background
-                        nextStep: "consequence",
-                        debtEffect: 5500,
-                        stressEffect: 35,
-                        jumpTitle: "The Hustle Reality",
-                        jumpSub: "4 Months Later",
-                        consequenceMsg: "Kevin texts: \"The 'Mastermind' was just basic pre-recorded videos. I spent $3,500 on the course, lost $2,000 running terrible ads, and got zero sales. My card is maxed.\"",
+                        text: "It's your life. If you hate your job that much, quit and chase your dream.", 
+                        trustEffect: -10, intervention_level: "give_up",
+                        kevinReply: "Exactly! You gotta take big risks to get big rewards. Drafting my resignation email right now! 🚀",
+                        mood: "agree", nextStep: "consequence",
+                        debtEffect: 15000, stressEffect: 35,
+                        jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later",
+                        consequenceMsg: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"",
                         consequenceMood: "upset"
                     }
                 ]
@@ -221,7 +207,6 @@
             }, 50);
         }
 
-        // --- UPDATED: Added Yellow 'complain' mood ---
         function setChatMood(mood) {
             chatBox.classList.remove('bg-slate-50', 'bg-red-50', 'bg-green-50', 'bg-slate-200', 'bg-yellow-50');
             if (mood === 'argue') chatBox.classList.add('bg-red-50');
@@ -318,10 +303,11 @@
             choicePanel.classList.add('hidden');
             addUserMessage(choice.text);
             
-            gtag('event', 'choice_made', {
+            // v3.5 NEW: Track Intervention Level (High/Medium/Give Up)
+            gtag('event', 'attempted_intervention', {
                 'event_category': 'Decision',
                 'scenario_name': event.scenarioName,
-                'choice_text': choice.text,
+                'intervention_level': choice.intervention_level,
                 'thinking_time_sec': Math.round((Date.now() - scenarioStartTime) / 1000)
             });
             
@@ -329,7 +315,6 @@
 
             setTimeout(() => {
                 showTyping(() => {
-                    // This is where Kevin replies. We use the specific mood assigned to the choice (argue, complain, or agree)
                     addKevinMessage(choice.kevinReply, false, choice.mood);
                     
                     if (choice.nextStep === 'followup') {
@@ -365,23 +350,26 @@
             choicePanel.classList.add('hidden');
             addUserMessage(choice.text);
 
-            gtag('event', 'followup_choice_made', {
-                'event_category': 'Decision',
-                'scenario_name': scenarioName,
-                'is_strict': choice.isStrict
-            });
-
             stats.debt += choice.debtEffect;
             stats.stress += choice.stressEffect;
 
             let listened = false;
-            // Kevin has a chance to listen if you give strict advice. If you give up (isStrict: false), he won't listen.
             if (choice.isStrict) {
                 listened = (Math.random() * 100) < stats.trust + 20; 
             }
 
+            // v3.5 NEW: Track if Kevin rejected or listened to the final push
+            if (listened) {
+                gtag('event', 'kevin_listened', {
+                    'scenario_name': scenarioName
+                });
+            } else {
+                gtag('event', 'kevin_rejected_advice', {
+                    'scenario_name': scenarioName
+                });
+            }
+
             const finalReply = listened ? choice.listenMsg : choice.resistMsg;
-            // If he resists the second push, it becomes a full 'argue' (Red). If he listens, it's 'agree' (Green).
             const replyMood = listened ? 'agree' : 'argue';
 
             setTimeout(() => {
@@ -511,8 +499,10 @@
                 `;
             }
 
-            gtag('event', currentEndingType, {
+            // v3.5 NEW: Clean 'ending_reached' event with parameter
+            gtag('event', 'ending_reached', {
                 'event_category': 'Completion',
+                'ending_type': currentEndingType,
                 'final_debt': stats.debt,
                 'final_stress': stats.stress,
                 'final_trust': stats.trust
@@ -534,10 +524,6 @@
                         <span>😵 Stress Level</span>
                         <span class="text-gray-800 font-bold">${stats.stress}/100</span>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span>🤝 Trust in You</span>
-                        <span class="text-blue-600 font-bold">${stats.trust}/100</span>
-                    </div>
                 </div>
 
                 <button onclick="handleReplay()"
@@ -553,7 +539,8 @@
         }
 
         function handleReplay() {
-            gtag('event', 'restart_game', { 
+            // v3.5 NEW: Rage Replay Event
+            gtag('event', 'rage_replay', { 
                 'event_category': 'Engagement',
                 'replayed_from': currentEndingType
             });
