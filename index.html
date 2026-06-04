@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kevin Life Simulator v4.0</title>
+    <title>Kevin Life Simulator v4.2</title>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
@@ -17,8 +17,8 @@
         :root {
             --bg-color: #f3f4f6;
             --chat-bg: #ffffff;
-            --user-bubble: #007aff; /* iMessage Blue */
-            --kevin-bubble: #e5e5ea; /* iMessage Grey */
+            --user-bubble: #007aff;
+            --kevin-bubble: #e5e5ea;
             --text-dark: #1f2937;
             --text-light: #ffffff;
             --border: #e5e7eb;
@@ -26,38 +26,32 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
         
-        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; height: 100vh; }
+        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; height: 100vh; overflow: hidden; }
         
         #app-container {
-            width: 100%; max-width: 480px; background: var(--chat-bg); display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Stats Bar */
-        #stats-bar {
-            padding: 15px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 600; font-size: 14px;
+            width: 100%; max-width: 480px; background: var(--chat-bg); display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); height: 100%;
         }
 
         /* Chat Window */
         #chat-window {
-            flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-color: #ffffff;
+            flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-color: #ffffff; scroll-behavior: smooth;
         }
 
         .message { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.4; animation: fadeIn 0.3s ease-in; }
         
         .kevin-msg { background-color: var(--kevin-bubble); color: #000; align-self: flex-start; border-bottom-left-radius: 4px; }
         .user-msg { background-color: var(--user-bubble); color: var(--text-light); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .system-msg { align-self: center; background-color: transparent; color: #6b7280; font-size: 12px; font-style: italic; max-width: 100%; text-align: center; }
+        .system-msg { align-self: center; background-color: transparent; color: #6b7280; font-size: 13px; font-weight: 500; font-style: italic; max-width: 90%; text-align: center; margin: 10px 0; }
 
         /* Choices Area */
         #choices-container {
-            padding: 15px; background: #ffffff; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;
+            padding: 15px; background: #ffffff; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; max-height: 45vh; overflow-y: auto;
         }
 
         .choice-btn {
-            background-color: #ffffff; border: 1px solid #d1d5db; color: var(--text-dark); padding: 14px; border-radius: 12px; font-size: 15px; cursor: pointer; text-align: left; transition: all 0.2s;
+            background-color: #ffffff; border: 1px solid #d1d5db; color: var(--text-dark); padding: 14px; border-radius: 12px; font-size: 15px; cursor: pointer; text-align: left; transition: all 0.2s; flex-shrink: 0;
         }
         
-        /* Removed color hints entirely. Buttons just turn light grey on hover to indicate they are clickable. */
         .choice-btn:hover { background-color: #f3f4f6; border-color: #9ca3af; }
 
         #intro-modal {
@@ -80,11 +74,6 @@
         <button class="start-btn" onclick="startGame()">Start Giving Advice</button>
     </div>
 
-    <div id="stats-bar" style="display: none;">
-        <span id="debt-display">💸 Debt: $0</span>
-        <span id="stress-display">😰 Stress: 0/100</span>
-    </div>
-
     <div id="chat-window"></div>
     <div id="choices-container"></div>
 </div>
@@ -96,13 +85,20 @@
         stress: 20,
         trust: 0, 
         currentScenario: 0,
-        cryptoLost: false // Cross-scenario memory
+        cryptoLost: false 
     };
 
     const chatWindow = document.getElementById('chat-window');
     const choicesContainer = document.getElementById('choices-container');
 
-    // SCENARIOS DEFINITION (v4.0 The Reality Check)
+    // UI Helper: Scroll to bottom whenever new content appears
+    function scrollToBottom() {
+        setTimeout(() => {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }, 50);
+    }
+
+    // SCENARIOS DEFINITION
     const scenarios = [
         {
             // Scenario 1: The Car
@@ -112,20 +108,19 @@
                     text: "72 months is insane. You'll be underwater immediately on a depreciating asset.",
                     type: "strict",
                     pushback: "Bro, literally everyone finances for 6 years now. It's the only way to afford anything decent.",
-                    baseListenChance: 0.2
+                    baseListenChance: 0.15
                 },
                 {
                     text: "You work hard, but don't trap yourself with that monthly payment. Think about your cash flow.",
                     type: "empathetic",
                     pushback: "I do work hard, exactly. I put in 50 hours a week, I deserve a car that isn't falling apart.",
-                    baseListenChance: 0.3
-                },
-                {
-                    text: "Do whatever you want man. It's your money.",
-                    type: "give_up",
-                    pushback: "Yeah, exactly. I'm signing.",
-                    baseListenChance: 0.0
+                    baseListenChance: 0.25
                 }
+            ],
+            followUps: [
+                { text: "You're going to regret this every single month when that payment hits your account.", modifier: 0.05, type: "logic" },
+                { text: "Please, just sleep on it for one night before signing anything. For me.", modifier: 0.15, type: "plea" },
+                { text: "Fine, buy the truck. Enjoy being broke.", modifier: -1.0, type: "give_up", pushback: "Thanks for the support. Signing now." }
             ],
             consequence: {
                 ignored: { debt: 45000, stress: 30, text: "Kevin signed the 72-month loan at 9% interest." },
@@ -140,20 +135,19 @@
                     text: "That is literally the definition of a pump and dump scam. Do not do this.",
                     type: "strict",
                     pushback: "You guys just like watching your money rot in a savings account at 4%. This is how real wealth is made.",
-                    baseListenChance: 0.15 
+                    baseListenChance: 0.10 
                 },
                 {
-                    text: "I know it's tempting seeing Jack win, but this is gambling, not investing. Please don't risk your savings.",
+                    text: "I know it's tempting seeing Jack win, but this is gambling. Please don't risk your savings.",
                     type: "empathetic",
                     pushback: "It's calculated risk. If I don't take a swing now, I'm gonna be working in a cubicle until I'm 70.",
-                    baseListenChance: 0.25
-                },
-                {
-                    text: "Good luck. Hope you don't lose it all.",
-                    type: "give_up",
-                    pushback: "I won't. Watch me.",
-                    baseListenChance: 0.0
+                    baseListenChance: 0.20
                 }
+            ],
+            followUps: [
+                { text: "Jack got lucky. You are going to be left holding the bag. It's a scam.", modifier: 0.05, type: "logic" },
+                { text: "Don't gamble your emergency fund. What happens if you lose your job next month?", modifier: 0.15, type: "plea" },
+                { text: "Your money, your mistake. Go for it.", modifier: -1.0, type: "give_up", pushback: "I won't lose it. Watch me." }
             ],
             consequence: {
                 ignored: { debt: 15000, stress: 40, cryptoLossFlag: true, text: "The coin rug-pulled. Kevin lost his entire savings and took out a personal loan to cover rent." },
@@ -174,20 +168,19 @@
                     text: "You cannot pay rent with 50K views. You have no business plan and no emergency fund.",
                     type: "strict",
                     pushback: "You just don't get the creator economy. Brands are already reaching out. If I don't jump now, I miss the wave.",
-                    baseListenChance: 0.2
+                    baseListenChance: 0.15
                 },
                 {
                     text: "That's awesome about the views! But do both for now. Don't quit until TikTok replaces your actual salary.",
                     type: "empathetic",
                     pushback: "I can't scale it if I'm stuck at a desk 8 hours a day. You have to burn the boats to succeed.",
-                    baseListenChance: 0.3
-                },
-                {
-                    text: "Sure, go be an influencer. Have fun.",
-                    type: "give_up",
-                    pushback: "Thanks for the overwhelming support. 🙄 Putting in my notice.",
-                    baseListenChance: 0.0
+                    baseListenChance: 0.20
                 }
+            ],
+            followUps: [
+                { text: "50K views pays literally nothing. Do the math before you ruin your career.", modifier: 0.05, type: "logic" },
+                { text: "Just wait 3 months. If it's still growing then, I'll fully support you quitting.", modifier: 0.15, type: "plea" },
+                { text: "Have fun being unemployed.", modifier: -1.0, type: "give_up", pushback: "Whatever. Putting in my notice." }
             ],
             consequence: {
                 ignored: { debt: 20000, stress: 50, text: "Kevin quit. The algorithm changed, his views tanked, and he lived on credit cards for 6 months." },
@@ -198,16 +191,8 @@
 
     function startGame() {
         document.getElementById('intro-modal').style.display = 'none';
-        document.getElementById('stats-bar').style.display = 'flex';
         gtag('event', 'game_start');
         loadScenario();
-    }
-
-    function updateUI() {
-        // Cap stress at 100 for the UI display
-        let displayStress = state.stress > 100 ? 100 : state.stress;
-        document.getElementById('debt-display').innerText = `💸 Debt: $${state.debt.toLocaleString()}`;
-        document.getElementById('stress-display').innerText = `😰 Stress: ${displayStress}/100`;
     }
 
     function addMessage(text, sender) {
@@ -215,7 +200,7 @@
         msgDiv.className = `message ${sender}-msg`;
         msgDiv.innerText = text;
         chatWindow.appendChild(msgDiv);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
+        scrollToBottom();
     }
 
     function loadScenario() {
@@ -228,26 +213,41 @@
         const scenario = scenarios[state.currentScenario];
         gtag('event', 'scenario_reached', { scenario_index: state.currentScenario });
         
-        // Handle dynamic setup for Scenario 3 memory
         let setupText = scenario.setup ? scenario.setup : scenario.getSetup();
         
         setTimeout(() => {
             addMessage(setupText, 'kevin');
-            renderChoices(scenario);
+            
+            let initialChoices = [...scenario.choices, {
+                text: "Do whatever you want man. It's your money.",
+                type: "give_up",
+                pushback: "Yeah, exactly. Doing it.",
+                baseListenChance: -1.0
+            }];
+
+            renderChoices(initialChoices, scenario, false);
         }, 800);
     }
 
-    function renderChoices(scenario) {
-        scenario.choices.forEach((choice, index) => {
+    function renderChoices(choicesArray, scenario, isFollowUp, baseListenChance = 0) {
+        choicesContainer.innerHTML = '';
+        choicesArray.forEach(choice => {
             const btn = document.createElement('button');
             btn.className = 'choice-btn';
             btn.innerText = choice.text;
-            btn.onclick = () => handleChoice(choice, scenario);
+            btn.onclick = () => {
+                if (!isFollowUp) {
+                    handleInitialChoice(choice, scenario);
+                } else {
+                    resolveScenario(choice, baseListenChance, scenario);
+                }
+            };
             choicesContainer.appendChild(btn);
         });
+        scrollToBottom();
     }
 
-    function handleChoice(choice, scenario) {
+    function handleInitialChoice(choice, scenario) {
         gtag('event', 'attempted_intervention', { intervention_type: choice.type });
         choicesContainer.innerHTML = '';
         addMessage(choice.text, 'user');
@@ -260,27 +260,28 @@
             return;
         }
 
-        // The Pushback Phase
         setTimeout(() => {
             addMessage(choice.pushback, 'kevin');
             
-            // Final Warning Button
             setTimeout(() => {
-                const finalBtn = document.createElement('button');
-                finalBtn.className = 'choice-btn';
-                finalBtn.innerText = "Look, just trust me on this. Please.";
-                finalBtn.onclick = () => resolveScenario(choice, scenario);
-                choicesContainer.appendChild(finalBtn);
+                renderChoices(scenario.followUps, scenario, true, choice.baseListenChance);
             }, 800);
         }, 1200);
     }
 
-    function resolveScenario(choice, scenario) {
+    function resolveScenario(followUpChoice, baseListenChance, scenario) {
         choicesContainer.innerHTML = '';
-        addMessage("Look, just trust me on this. Please.", 'user');
+        addMessage(followUpChoice.text, 'user');
 
-        // Logic Check: Did he listen? (Much harder now)
-        let totalChance = choice.baseListenChance + (state.trust * 0.01);
+        if (followUpChoice.type === "give_up") {
+            setTimeout(() => {
+                addMessage(followUpChoice.pushback, 'kevin');
+                applyConsequences(scenario.consequence.ignored);
+            }, 1000);
+            return;
+        }
+
+        let totalChance = baseListenChance + followUpChoice.modifier + (state.trust * 0.01);
         let roll = Math.random();
         
         let listened = roll < totalChance;
@@ -303,13 +304,14 @@
             state.debt += result.debt;
             state.stress += result.stress;
             if (result.trust) state.trust += result.trust;
-            if (result.cryptoLossFlag) state.cryptoLost = true; // Set memory flag
+            if (result.cryptoLossFlag) state.cryptoLost = true; 
             
-            updateUI();
-            addMessage(`* ${result.text} *`, 'system');
+            let displayStress = state.stress > 100 ? 100 : state.stress;
+            let summaryText = `${result.text}\n\n💸 Current Debt: $${state.debt.toLocaleString()} | 😰 Stress Level: ${displayStress}/100`;
+            addMessage(summaryText, 'system');
             
             state.currentScenario++;
-            setTimeout(loadScenario, 2500);
+            setTimeout(loadScenario, 3500);
         }, 1500);
     }
 
@@ -321,7 +323,6 @@
             if (state.debt === 0) {
                 addMessage("Okay... honestly, thank you. If you hadn't stopped me, I would have ruined my life. I owe you.", 'kevin');
             } else {
-                // The Guilt Trip Ending to drive Rage Replays
                 addMessage("You were right, okay? Are you happy now? I have massive debt, my credit is ruined, and I have to move back in with my parents. I wish you had tried harder to stop me. Don't text me.", 'kevin');
             }
             
@@ -334,6 +335,7 @@
                     location.reload();
                 };
                 choicesContainer.appendChild(replayBtn);
+                scrollToBottom();
             }, 1000);
         }, 1000);
     }
