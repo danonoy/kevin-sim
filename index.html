@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kevin Life Simulator v4.2</title>
+    <title>Kevin Life Simulator v4.3</title>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
@@ -29,7 +29,7 @@
         body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; height: 100vh; overflow: hidden; }
         
         #app-container {
-            width: 100%; max-width: 480px; background: var(--chat-bg); display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); height: 100%;
+            width: 100%; max-width: 480px; background: var(--chat-bg); display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); height: 100%; position: relative;
         }
 
         /* Chat Window */
@@ -41,7 +41,9 @@
         
         .kevin-msg { background-color: var(--kevin-bubble); color: #000; align-self: flex-start; border-bottom-left-radius: 4px; }
         .user-msg { background-color: var(--user-bubble); color: var(--text-light); align-self: flex-end; border-bottom-right-radius: 4px; }
-        .system-msg { align-self: center; background-color: transparent; color: #6b7280; font-size: 13px; font-weight: 500; font-style: italic; max-width: 90%; text-align: center; margin: 10px 0; }
+        
+        /* Subtle iMessage style timestamp/action text */
+        .system-msg { align-self: center; background-color: transparent; color: #8e8e93; font-size: 12px; font-weight: 500; max-width: 90%; text-align: center; margin: 10px 0; }
 
         /* Choices Area */
         #choices-container {
@@ -54,6 +56,7 @@
         
         .choice-btn:hover { background-color: #f3f4f6; border-color: #9ca3af; }
 
+        /* Intro Modal */
         #intro-modal {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; z-index: 10;
         }
@@ -79,7 +82,7 @@
 </div>
 
 <script>
-    // Game State
+    // Game State (Values are hidden from UI but used for logic & tracking)
     let state = {
         debt: 0,
         stress: 20,
@@ -91,7 +94,7 @@
     const chatWindow = document.getElementById('chat-window');
     const choicesContainer = document.getElementById('choices-container');
 
-    // UI Helper: Scroll to bottom whenever new content appears
+    // UI Helper: Scroll to bottom
     function scrollToBottom() {
         setTimeout(() => {
             chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -124,7 +127,7 @@
             ],
             consequence: {
                 ignored: { debt: 45000, stress: 30, text: "Kevin signed the 72-month loan at 9% interest." },
-                listened: { debt: 0, stress: 0, trust: 10, text: "Kevin walked away from the dealership. He bought a used Honda instead." }
+                listened: { debt: 0, stress: 0, trust: 10, text: "Kevin walked away from the dealership and bought a used Honda instead." }
             }
         },
         {
@@ -151,11 +154,11 @@
             ],
             consequence: {
                 ignored: { debt: 15000, stress: 40, cryptoLossFlag: true, text: "The coin rug-pulled. Kevin lost his entire savings and took out a personal loan to cover rent." },
-                listened: { debt: 0, stress: 0, trust: 15, text: "Kevin didn't invest. The coin crashed 98% two days later. He realizes you saved him." }
+                listened: { debt: 0, stress: 0, trust: 15, text: "Kevin didn't invest. The coin crashed 98% two days later." }
             }
         },
         {
-            // Scenario 3: The Career/TikTok (Dynamic based on memory)
+            // Scenario 3: The Career/TikTok
             getSetup: () => {
                 if (state.cryptoLost) {
                     return "Look, I know the crypto thing was a massive disaster. But this is different. My video just hit 50K views. I'm quitting my job on Friday to do TikTok full-time.";
@@ -306,12 +309,11 @@
             if (result.trust) state.trust += result.trust;
             if (result.cryptoLossFlag) state.cryptoLost = true; 
             
-            let displayStress = state.stress > 100 ? 100 : state.stress;
-            let summaryText = `${result.text}\n\n💸 Current Debt: $${state.debt.toLocaleString()} | 😰 Stress Level: ${displayStress}/100`;
-            addMessage(summaryText, 'system');
+            // Only output the narrative action text, NO NUMBERS
+            addMessage(result.text, 'system');
             
             state.currentScenario++;
-            setTimeout(loadScenario, 3500);
+            setTimeout(loadScenario, 3000);
         }, 1500);
     }
 
@@ -336,8 +338,8 @@
                 };
                 choicesContainer.appendChild(replayBtn);
                 scrollToBottom();
-            }, 1000);
-        }, 1000);
+            }, 1500);
+        }, 1500);
     }
 </script>
 </body>
