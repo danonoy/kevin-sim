@@ -3,554 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kevin Life Simulator v3.5</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Kevin Life Simulator v4.0</title>
     
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TBP17V9M20"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-TBP17V9M20');
+      gtag('config', 'G-XXXXXXXXXX'); // REPLACE WITH YOUR GA4 ID
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #111827; }
-        ::-webkit-scrollbar { display: none; }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        .slide-up { animation: slideUp 0.3s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .chat-bubble-u { background-color: #3b82f6; color: #ffffff; border-bottom-right-radius: 4px; }
-        .system-bubble { background: transparent; border: 1px solid #e5e7eb; border-radius: 4px; color: #6b7280; font-size: 0.75rem; text-align: center; padding: 6px 12px; margin: 0 auto; text-transform: uppercase; letter-spacing: 0.05em;}
-        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
-        #chat-box { transition: background-color 0.8s ease-in-out; }
+        :root {
+            --bg-color: #f3f4f6;
+            --chat-bg: #ffffff;
+            --user-bubble: #007aff; /* iMessage Blue */
+            --kevin-bubble: #e5e5ea; /* iMessage Grey */
+            --text-dark: #1f2937;
+            --text-light: #ffffff;
+            --border: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; justify-content: center; height: 100vh; }
+        
+        #app-container {
+            width: 100%; max-width: 480px; background: var(--chat-bg); display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Stats Bar */
+        #stats-bar {
+            padding: 15px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 600; font-size: 14px;
+        }
+
+        /* Chat Window */
+        #chat-window {
+            flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background-color: #ffffff;
+        }
+
+        .message { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.4; animation: fadeIn 0.3s ease-in; }
+        
+        .kevin-msg { background-color: var(--kevin-bubble); color: #000; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .user-msg { background-color: var(--user-bubble); color: var(--text-light); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .system-msg { align-self: center; background-color: transparent; color: #6b7280; font-size: 12px; font-style: italic; max-width: 100%; text-align: center; }
+
+        /* Choices Area */
+        #choices-container {
+            padding: 15px; background: #ffffff; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;
+        }
+
+        .choice-btn {
+            background-color: #ffffff; border: 1px solid #d1d5db; color: var(--text-dark); padding: 14px; border-radius: 12px; font-size: 15px; cursor: pointer; text-align: left; transition: all 0.2s;
+        }
+        
+        /* Removed color hints entirely. Buttons just turn light grey on hover to indicate they are clickable. */
+        .choice-btn:hover { background-color: #f3f4f6; border-color: #9ca3af; }
+
+        #intro-modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; z-index: 10;
+        }
+
+        .start-btn, .replay-btn {
+            margin-top: 20px; background: var(--user-bubble); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen py-4 sm:py-8">
+<body>
 
-    <div class="w-full max-w-sm h-[800px] max-h-screen bg-white shadow-2xl relative flex flex-col sm:rounded-[2.5rem] border-[8px] border-gray-900 overflow-hidden">
-        
-        <div class="bg-gray-100/90 backdrop-blur-sm border-b border-gray-200 px-4 py-3 flex items-center gap-3 z-10 shrink-0">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-700 to-gray-900 flex items-center justify-center text-white font-bold text-lg shadow-inner">K</div>
-            <div>
-                <h2 class="font-bold text-gray-800 leading-tight">Kevin</h2>
-                <p class="text-xs text-green-600 font-bold">Online</p>
-            </div>
-        </div>
-
-        <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4 bg-slate-50">
-            </div>
-
-        <div id="choice-panel" class="bg-white border-t border-gray-200 p-3 hidden slide-up shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-20 shrink-0">
-            <p class="text-[10px] font-bold text-gray-400 text-center uppercase tracking-widest mb-2" id="choice-header">Give Advice</p>
-            <div id="choices-container" class="space-y-2 max-h-[35vh] overflow-y-auto pb-1">
-                </div>
-        </div>
-
-        <div id="time-jump" class="absolute inset-0 bg-slate-900/95 z-30 flex flex-col items-center justify-center hidden fade-in text-white">
-            <p class="text-gray-400 text-sm mb-2" id="jump-subtitle">3 Months Later...</p>
-            <h2 class="text-2xl font-black tracking-widest text-center px-4" id="jump-title">Life is Good</h2>
-        </div>
-
+<div id="app-container">
+    <div id="intro-modal">
+        <h2>Kevin is 25.</h2>
+        <p style="margin-top: 15px; color: #4b5563; line-height: 1.5;">He makes decent money, but he is constantly one choice away from a disaster.<br><br>He's about to make some major financial decisions. <strong>How they turn out depends entirely on you.</strong></p>
+        <button class="start-btn" onclick="startGame()">Start Giving Advice</button>
     </div>
 
-    <script>
-        const chatBox = document.getElementById('chat-box');
-        const choicePanel = document.getElementById('choice-panel');
-        const choicesContainer = document.getElementById('choices-container');
-        const choiceHeader = document.getElementById('choice-header');
-        const timeJump = document.getElementById('time-jump');
+    <div id="stats-bar" style="display: none;">
+        <span id="debt-display">💸 Debt: $0</span>
+        <span id="stress-display">😰 Stress: 0/100</span>
+    </div>
+
+    <div id="chat-window"></div>
+    <div id="choices-container"></div>
+</div>
+
+<script>
+    // Game State
+    let state = {
+        debt: 0,
+        stress: 20,
+        trust: 0, 
+        currentScenario: 0,
+        cryptoLost: false // Cross-scenario memory
+    };
+
+    const chatWindow = document.getElementById('chat-window');
+    const choicesContainer = document.getElementById('choices-container');
+
+    // SCENARIOS DEFINITION (v4.0 The Reality Check)
+    const scenarios = [
+        {
+            // Scenario 1: The Car
+            setup: "Just test drove a 2026 Tacoma. Dealership offered 72 months, payments are actually totally doable. Pulling the trigger today.",
+            choices: [
+                {
+                    text: "72 months is insane. You'll be underwater immediately on a depreciating asset.",
+                    type: "strict",
+                    pushback: "Bro, literally everyone finances for 6 years now. It's the only way to afford anything decent.",
+                    baseListenChance: 0.2
+                },
+                {
+                    text: "You work hard, but don't trap yourself with that monthly payment. Think about your cash flow.",
+                    type: "empathetic",
+                    pushback: "I do work hard, exactly. I put in 50 hours a week, I deserve a car that isn't falling apart.",
+                    baseListenChance: 0.3
+                },
+                {
+                    text: "Do whatever you want man. It's your money.",
+                    type: "give_up",
+                    pushback: "Yeah, exactly. I'm signing.",
+                    baseListenChance: 0.0
+                }
+            ],
+            consequence: {
+                ignored: { debt: 45000, stress: 30, text: "Kevin signed the 72-month loan at 9% interest." },
+                listened: { debt: 0, stress: 0, trust: 10, text: "Kevin walked away from the dealership. He bought a used Honda instead." }
+            }
+        },
+        {
+            // Scenario 2: Crypto
+            setup: "My buddy Jack just made $40K on some alt-coin presale. He sent me the private Discord link. I'm transferring my savings in now.",
+            choices: [
+                {
+                    text: "That is literally the definition of a pump and dump scam. Do not do this.",
+                    type: "strict",
+                    pushback: "You guys just like watching your money rot in a savings account at 4%. This is how real wealth is made.",
+                    baseListenChance: 0.15 
+                },
+                {
+                    text: "I know it's tempting seeing Jack win, but this is gambling, not investing. Please don't risk your savings.",
+                    type: "empathetic",
+                    pushback: "It's calculated risk. If I don't take a swing now, I'm gonna be working in a cubicle until I'm 70.",
+                    baseListenChance: 0.25
+                },
+                {
+                    text: "Good luck. Hope you don't lose it all.",
+                    type: "give_up",
+                    pushback: "I won't. Watch me.",
+                    baseListenChance: 0.0
+                }
+            ],
+            consequence: {
+                ignored: { debt: 15000, stress: 40, cryptoLossFlag: true, text: "The coin rug-pulled. Kevin lost his entire savings and took out a personal loan to cover rent." },
+                listened: { debt: 0, stress: 0, trust: 15, text: "Kevin didn't invest. The coin crashed 98% two days later. He realizes you saved him." }
+            }
+        },
+        {
+            // Scenario 3: The Career/TikTok (Dynamic based on memory)
+            getSetup: () => {
+                if (state.cryptoLost) {
+                    return "Look, I know the crypto thing was a massive disaster. But this is different. My video just hit 50K views. I'm quitting my job on Friday to do TikTok full-time.";
+                } else {
+                    return "My video just hit 50K views. I'm putting my two weeks in on Friday to do TikTok full-time. The corporate grind is dead.";
+                }
+            },
+            choices: [
+                {
+                    text: "You cannot pay rent with 50K views. You have no business plan and no emergency fund.",
+                    type: "strict",
+                    pushback: "You just don't get the creator economy. Brands are already reaching out. If I don't jump now, I miss the wave.",
+                    baseListenChance: 0.2
+                },
+                {
+                    text: "That's awesome about the views! But do both for now. Don't quit until TikTok replaces your actual salary.",
+                    type: "empathetic",
+                    pushback: "I can't scale it if I'm stuck at a desk 8 hours a day. You have to burn the boats to succeed.",
+                    baseListenChance: 0.3
+                },
+                {
+                    text: "Sure, go be an influencer. Have fun.",
+                    type: "give_up",
+                    pushback: "Thanks for the overwhelming support. 🙄 Putting in my notice.",
+                    baseListenChance: 0.0
+                }
+            ],
+            consequence: {
+                ignored: { debt: 20000, stress: 50, text: "Kevin quit. The algorithm changed, his views tanked, and he lived on credit cards for 6 months." },
+                listened: { debt: 0, stress: -10, trust: 20, text: "Kevin kept his job and did YouTube on weekends. He got a promotion at work." }
+            }
+        }
+    ];
+
+    function startGame() {
+        document.getElementById('intro-modal').style.display = 'none';
+        document.getElementById('stats-bar').style.display = 'flex';
+        gtag('event', 'game_start');
+        loadScenario();
+    }
+
+    function updateUI() {
+        // Cap stress at 100 for the UI display
+        let displayStress = state.stress > 100 ? 100 : state.stress;
+        document.getElementById('debt-display').innerText = `💸 Debt: $${state.debt.toLocaleString()}`;
+        document.getElementById('stress-display').innerText = `😰 Stress: ${displayStress}/100`;
+    }
+
+    function addMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${sender}-msg`;
+        msgDiv.innerText = text;
+        chatWindow.appendChild(msgDiv);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function loadScenario() {
+        choicesContainer.innerHTML = '';
+        if (state.currentScenario >= scenarios.length) {
+            endGame();
+            return;
+        }
+
+        const scenario = scenarios[state.currentScenario];
+        gtag('event', 'scenario_reached', { scenario_index: state.currentScenario });
         
-        let stats = { trust: 50, stress: 50, debt: 0 };
-        let currentStage = 0;
-        let scenarioStartTime = 0; 
-        let currentEndingType = ''; 
+        // Handle dynamic setup for Scenario 3 memory
+        let setupText = scenario.setup ? scenario.setup : scenario.getSetup();
+        
+        setTimeout(() => {
+            addMessage(setupText, 'kevin');
+            renderChoices(scenario);
+        }, 800);
+    }
 
-        // v3.5 Story Logic: Emotionally Manipulative & High-Stakes
-        const storyEvents = [
-            {
-                scenarioName: "The Car (Status Anxiety)",
-                setup: [
-                    "Dude, I'm seriously thinking about getting a Model Y 😅",
-                    "Payments would be like $1,100 a month. I make $3,800, so... that's fine, right?",
-                    "Went to my buddy's birthday last weekend and THREE people pulled up in new cars. I showed up in my 2015 Corolla and wanted to die 😩"
-                ],
-                choices: [
-                    { 
-                        text: "That's a terrible idea right now. Save up a real down payment first.", 
-                        trustEffect: 5, intervention_level: "high",
-                        kevinReply: "You always just lecture me. You don't understand what it feels like to be looked down on. I can make it work 😤",
-                        mood: "argue", nextStep: "followup",
-                        followup_choices: [
-                            { text: "$1,100 x 72 months. You have barely any savings. Do the math, Kevin.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Okay yeah, when you put it that way... $1,100 plus insurance is basically 40% of my take-home. I'm gonna hold off. 😮", resistMsg: "I don't care, I already went back to test drive it. It felt amazing. I'm doing it 😤", jumpTitle: "The Reality Check", jumpSub: "6 Months Later", outcomeListened: "Kevin didn't buy the car. He texts you: \"Hey, remember when you talked me out of the Model Y? My coworker just bought one and he literally can't afford lunch now. Thanks for that.\"", outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
-                            { text: "Real friends aren't gonna respect you more because of a car.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Damn... you're probably right. If Jack cares about what car I drive, that's his problem. I'll stick with the Corolla for now.", resistMsg: "Easy for you to say. I'm tired of feeling like I'm falling behind. I'm buying it.", jumpTitle: "The Reality Check", jumpSub: "6 Months Later", outcomeListened: "Kevin didn't buy the car. He texts you: \"Hey, remember when you talked me out of the Model Y? My coworker just bought one and he literally can't afford lunch now. Thanks for that.\"", outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
-                            { text: "Alright, fine. Your call. Treat yourself.", isStrict: false, debtEffect: 65000, stressEffect: 30, listenMsg: "Haha I knew you'd get it! I'm signing the papers today. Sick! 😎", resistMsg: "Haha I knew you'd get it! I'm signing the papers today. Sick! 😎", jumpTitle: "Peak Euphoria", jumpSub: "2 Months Later", outcomeListened: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"", outcomeIgnored: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" }
-                        ]
-                    },
-                    { 
-                        text: "Get a used EV instead. Same vibe, way less financial damage.", 
-                        trustEffect: 5, intervention_level: "medium",
-                        kevinReply: "A used EV? Come on, Jack pulled up in a Porsche. I can't show up in a used Leaf. It has to be the new Model Y. 😩",
-                        mood: "complain", nextStep: "followup",
-                        followup_choices: [
-                            { text: "Don't go broke trying to impress Jack. Buy what you can actually afford.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Yeah... impressing Jack isn't worth going broke. I backed out and got a used Golf instead. It's fine.", resistMsg: "I'm not compromising on this. I want the new one and I'm getting it. 😤", jumpTitle: "A Modest Compromise", jumpSub: "2 Months Later", outcomeListened: "Kevin texts: \"The used car is fine. Not as flashy, but it gets me around and I'm not stressing over the payments at all.\"", outcomeIgnored: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
-                            { text: "A used Tesla still looks brand new to most people. Save your cash.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Actually, you make a good point. Found a used 2021 model for way cheaper. Going with that instead.", resistMsg: "No, I want the newest tech. I'm signing for the brand new one today.", jumpTitle: "A Modest Compromise", jumpSub: "2 Months Later", outcomeListened: "Kevin texts: \"The used car is fine. Not as flashy, but it gets me around and I'm not stressing over the payments at all.\"", outcomeIgnored: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" },
-                            { text: "Whatever, get the new one if you care about Jack's opinion that much.", isStrict: false, debtEffect: 65000, stressEffect: 30, listenMsg: "Haha I knew you'd understand! I'm signing the papers today. Sick! 😎", resistMsg: "Haha I knew you'd understand! I'm signing the papers today. Sick! 😎", jumpTitle: "Peak Euphoria", jumpSub: "2 Months Later", outcomeListened: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"", outcomeIgnored: "Kevin bought the brand new car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"" }
-                        ]
-                    },
-                    { 
-                        text: "It's your money, man. Do what you want.", 
-                        trustEffect: -10, intervention_level: "give_up",
-                        kevinReply: "Exactly! I knew you wouldn't judge me. Scared money makes no money. I'm signing the papers today. Sick! 😎",
-                        mood: "agree", nextStep: "consequence",
-                        debtEffect: 65000, stressEffect: 30,
-                        jumpTitle: "Peak Euphoria", jumpSub: "2 Months Later",
-                        consequenceMsg: "Kevin bought the car. Third month in, his company does layoffs. He texts you: \"Bro I can't sleep. I've got 69 months left on the loan and they're threatening to repo it. I'm so cooked.\"",
-                        consequenceMood: "upset"
-                    }
-                ]
-            },
-            {
-                scenarioName: "Crypto FOMO",
-                setup: [
-                    "Okay so my buddy Jack just turned $20K into $80K in like 6 weeks on this one coin 👀",
-                    "He's telling me I need to get in NOW, before it explodes even more.",
-                    "I only have my savings but honestly... this feels like a once-in-a-lifetime thing, you know?"
-                ],
-                choices: [
-                    { 
-                        text: "That money is your emergency fund. You don't gamble with it. 5% max.", 
-                        trustEffect: 5, intervention_level: "high",
-                        kevinReply: "But he LITERALLY made $60K. That's real money. Am I just supposed to sit here and watch? I don't wanna be the guy who missed out 😤",
-                        mood: "argue", nextStep: "followup",
-                        followup_choices: [
-                            { text: "'Guaranteed returns' and 'closes soon' are textbook scam red flags.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "I looked it up. The website is three months old and my buddy's been weirdly pushy about it. I think I almost got scammed. Thanks for talking me down 😅", resistMsg: "You're too paranoid. I'm not missing this. I put half my savings in and maxed a credit card. Feeling good about this one 😏", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
-                            { text: "You only see the wins. For every guy who got rich, ten people lost everything.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "I guess you're right. I never hear Jack talk about the coins he lost money on. I'll keep my savings where they are.", resistMsg: "Whatever man, no risk no reward. I'm going all in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
-                            { text: "Okay fine, put in a little. Like $1,000 max.", isStrict: false, debtEffect: 8000, stressEffect: 20, listenMsg: "Alright, I'll just throw a grand at it. If I lose it, whatever.", resistMsg: "Alright, I'll just throw a grand at it. If I lose it, whatever.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin flash-crashed. Kevin texts: \"Well, that $1,000 is gone. Glad I didn't put my whole savings in like Jack did, but it still stings.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"Well, that $1,000 is gone. Glad I didn't put my whole savings in like Jack did, but it still stings.\"" }
-                        ]
-                    },
-                    { 
-                        text: "Ask him which coin. Look up the whitepaper first before doing anything.", 
-                        trustEffect: 5, intervention_level: "medium",
-                        kevinReply: "He said the window closes this week! I don't have time to read 50 pages of whitepapers right now! 😩",
-                        mood: "complain", nextStep: "followup",
-                        followup_choices: [
-                            { text: "If you don't have time to read what it is, you definitely shouldn't buy it.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "Yeah, throwing my life savings at something I don't understand is pretty dumb. I'll pass.", resistMsg: "I trust Jack. He did the research so I don't have to. I'm buying in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
-                            { text: "Scams rely on creating a false sense of urgency. Don't fall for it.", isStrict: true, debtEffect: 0, stressEffect: -5, listenMsg: "Now that you mention it, he was being super aggressive about 'getting in today'. Feels sketchy. I'm out.", resistMsg: "It's not a scam, it's just moving fast! I'm in.", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin collapsed. Kevin texts: \"That thing went to zero. Jack lost $60K. I can't believe I almost threw my whole savings in there. You literally saved me.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" },
-                            { text: "Alright, trust your gut I guess.", isStrict: false, debtEffect: 12000, stressEffect: 30, listenMsg: "My gut says GO. I'm wiring the money now! 🚀", resistMsg: "My gut says GO. I'm wiring the money now! 🚀", jumpTitle: "The Market Crash", jumpSub: "2 Months Later", outcomeListened: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"", outcomeIgnored: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"" }
-                        ]
-                    },
-                    { 
-                        text: "Jack made money, so it could work. Go for it.", 
-                        trustEffect: -10, intervention_level: "give_up",
-                        kevinReply: "Exactly! You miss 100% of the shots you don't take. I'm wiring my savings over right now. 🚀",
-                        mood: "agree", nextStep: "consequence",
-                        debtEffect: 12000, stressEffect: 30,
-                        jumpTitle: "The Market Crash", jumpSub: "2 Months Later",
-                        consequenceMsg: "The coin flash-crashed. Kevin texts: \"My portfolio is down 90%. The founders pulled the liquidity. I maxed my card for this and now I can't pay rent next month.\"",
-                        consequenceMood: "upset"
-                    }
-                ]
-            },
-            {
-                scenarioName: "The Influencer Trap (Quitting Job)",
-                setup: [
-                    "Dude, my TikTok video just hit 50K views. People are loving my content. 🔥",
-                    "My boss is being a jerk anyway. I'm literally wasting my life at this 9-to-5.",
-                    "I just put an iPhone 16 Pro Max and a year of CapCut Pro on my credit card. I'm thinking about quitting tomorrow to go all-in."
-                ],
-                choices: [
-                    { 
-                        text: "Do NOT quit your job. 50K views pays zero dollars. Build your channel on the weekends.", 
-                        trustEffect: 5, intervention_level: "high",
-                        kevinReply: "I can't build it on weekends! I'm too tired after work! You just don't understand the creator economy 😤",
-                        mood: "argue", nextStep: "followup",
-                        followup_choices: [
-                            { text: "Credit card debt at 24% interest will destroy you before you get a single sponsorship.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Ugh. Fine. You're right. I can't pay rent with views. I'll just grind it out on weekends for now. 😮‍💨", resistMsg: "I'll pay it off when I go viral next month. Watch me. I'm sending my resignation right now. ✌️", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, the algorithm changed and I barely get 200 views a video now. Thank GOD I didn't quit my job. I would be homeless right now.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" },
-                            { text: "The algorithm changes every week. You are trading a steady paycheck for a lottery ticket.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Damn. Yeah... going viral once doesn't mean anything. I'll keep the day job and film after work.", resistMsg: "I have the formula figured out. I'm betting on myself! Resignation sent.", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, the algorithm changed and I barely get 200 views a video now. Thank GOD I didn't quit my job. I would be homeless right now.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" },
-                            { text: "Alright man, it's your credit score. Good luck with the videos.", isStrict: false, debtEffect: 15000, stressEffect: 35, listenMsg: "Thanks for the support. I'm gonna crush this. 😎", resistMsg: "Thanks for the support. I'm gonna crush this. 😎", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" }
-                        ]
-                    },
-                    { 
-                        text: "Ask your boss to drop down to part-time first. Don't rely on credit cards to survive.", 
-                        trustEffect: 5, intervention_level: "medium",
-                        kevinReply: "Part-time means I lose my health benefits! If I'm gonna do this, I have to burn the boats and commit 100%! 😩",
-                        mood: "complain", nextStep: "followup",
-                        followup_choices: [
-                            { text: "If you 'burn the boats' using high-interest debt, you will drown before you reach the island.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "Ouch. Okay, that's fair. I'll just suck it up and edit videos at night until I actually make real money from it.", resistMsg: "You're just projecting your own limits. I'm taking the leap today.", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, the algorithm changed and I barely get 200 views a video now. Thank GOD I didn't quit my job. I would be homeless right now.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" },
-                            { text: "You literally cannot pay rent with TikTok likes. Save up a 6-month cash runway before you quit.", isStrict: true, debtEffect: 0, stressEffect: -10, listenMsg: "You're right. I'm jumping the gun. I'll start saving aggressively and see if my channel is still growing by winter.", resistMsg: "By the time I save 6 months of cash, this trend will be over. I have to strike now!", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"Bro, the algorithm changed and I barely get 200 views a video now. Thank GOD I didn't quit my job. I would be homeless right now.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" },
-                            { text: "Whatever you think is best. Just make sure you can make the minimum payments.", isStrict: false, debtEffect: 15000, stressEffect: 35, listenMsg: "I'll make the money back in a month anyway. Quitting today! 💸", resistMsg: "I'll make the money back in a month anyway. Quitting today! 💸", jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later", outcomeListened: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"", outcomeIgnored: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"" }
-                        ]
-                    },
-                    { 
-                        text: "It's your life. If you hate your job that much, quit and chase your dream.", 
-                        trustEffect: -10, intervention_level: "give_up",
-                        kevinReply: "Exactly! You gotta take big risks to get big rewards. Drafting my resignation email right now! 🚀",
-                        mood: "agree", nextStep: "consequence",
-                        debtEffect: 15000, stressEffect: 35,
-                        jumpTitle: "The Algorithm Reality", jumpSub: "4 Months Later",
-                        consequenceMsg: "Kevin texts: \"My views completely died. I owe $15K on my credit cards just from living expenses and buying gear. I have to ask for my old job back. I'm so embarrassed.\"",
-                        consequenceMood: "upset"
-                    }
-                ]
-            }
-        ];
+    function renderChoices(scenario) {
+        scenario.choices.forEach((choice, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerText = choice.text;
+            btn.onclick = () => handleChoice(choice, scenario);
+            choicesContainer.appendChild(btn);
+        });
+    }
 
-        function scrollToBottom() {
+    function handleChoice(choice, scenario) {
+        gtag('event', 'attempted_intervention', { intervention_type: choice.type });
+        choicesContainer.innerHTML = '';
+        addMessage(choice.text, 'user');
+
+        if (choice.type === "give_up") {
             setTimeout(() => {
-                chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
-            }, 50);
+                addMessage(choice.pushback, 'kevin');
+                applyConsequences(scenario.consequence.ignored);
+            }, 1000);
+            return;
         }
 
-        function setChatMood(mood) {
-            chatBox.classList.remove('bg-slate-50', 'bg-red-50', 'bg-green-50', 'bg-slate-200', 'bg-yellow-50');
-            if (mood === 'argue') chatBox.classList.add('bg-red-50');
-            else if (mood === 'complain') chatBox.classList.add('bg-yellow-50');
-            else if (mood === 'agree') chatBox.classList.add('bg-green-50');
-            else if (mood === 'upset') chatBox.classList.add('bg-slate-200');
-            else chatBox.classList.add('bg-slate-50'); 
-        }
-
-        function getBubbleStyle(mood) {
-            if (mood === 'argue') return 'bg-red-100 text-red-900 border border-red-200 font-medium';
-            if (mood === 'complain') return 'bg-yellow-100 text-yellow-900 border border-yellow-200 font-medium';
-            if (mood === 'agree') return 'bg-green-100 text-green-900 border border-green-200';
-            if (mood === 'upset') return 'bg-gray-300 text-gray-800 border border-gray-400 italic';
-            return 'bg-gray-100 text-gray-800 border border-gray-200'; 
-        }
-
-        function showTyping(callback) {
-            const id = 'typing-' + Date.now();
-            chatBox.insertAdjacentHTML('beforeend', `
-                <div id="${id}" class="flex gap-2 w-max max-w-[75%] px-4 py-3 rounded-2xl bg-gray-100 border border-gray-200 slide-up items-center rounded-bl-sm">
-                    <div class="w-1.5 h-1.5 bg-gray-400 rounded-full typing-dot"></div>
-                    <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
-                    <div class="w-1.5 h-1.5 bg-gray-500 rounded-full typing-dot"></div>
-                </div>
-            `);
-            scrollToBottom();
+        // The Pushback Phase
+        setTimeout(() => {
+            addMessage(choice.pushback, 'kevin');
+            
+            // Final Warning Button
             setTimeout(() => {
-                const el = document.getElementById(id);
-                if(el) el.remove();
-                callback();
-            }, 1200);
-        }
-
-        function addKevinMessage(text, isSystem = false, mood = 'neutral') {
-            if (isSystem) {
-                chatBox.insertAdjacentHTML('beforeend', `<div class="system-bubble slide-up my-2">${text}</div>`);
-            } else {
-                setChatMood(mood);
-                const bubbleStyle = getBubbleStyle(mood);
-                chatBox.insertAdjacentHTML('beforeend', `
-                    <div class="flex gap-2 w-max max-w-[85%] px-4 py-3 rounded-2xl ${bubbleStyle} slide-up text-[15px] leading-relaxed shadow-sm rounded-bl-sm">
-                        ${text}
-                    </div>
-                `);
-            }
-            scrollToBottom();
-        }
-
-        function addUserMessage(text) {
-            chatBox.insertAdjacentHTML('beforeend', `
-                <div class="flex gap-2 w-max max-w-[85%] px-4 py-3 rounded-2xl chat-bubble-u slide-up text-[15px] leading-relaxed shadow-sm self-end rounded-br-sm">
-                    ${text}
-                </div>
-            `);
-            scrollToBottom();
-        }
-
-        function sendMessageSequence(messages, mood = 'neutral', callback) {
-            let i = 0;
-            function sendNext() {
-                if (i < messages.length) {
-                    showTyping(() => {
-                        addKevinMessage(messages[i], false, mood);
-                        i++;
-                        setTimeout(sendNext, 800); 
-                    });
-                } else {
-                    if (callback) callback();
-                }
-            }
-            sendNext();
-        }
-
-        function promptChoices(stage) {
-            choicesContainer.innerHTML = '';
-            const event = storyEvents[stage];
-            choiceHeader.innerText = "Give Advice";
-
-            event.choices.forEach(choice => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-3.5 px-4 rounded-xl border border-gray-200 text-left text-[14px] leading-snug transition shadow-sm';
-                btn.innerText = choice.text;
-                btn.onclick = () => handleInitialChoice(choice, event);
-                choicesContainer.appendChild(btn);
-            });
-            
-            choicePanel.classList.remove('hidden');
-            scrollToBottom(); 
-            scenarioStartTime = Date.now();
-        }
-
-        function handleInitialChoice(choice, event) {
-            choicePanel.classList.add('hidden');
-            addUserMessage(choice.text);
-            
-            // v3.5 NEW: Track Intervention Level (High/Medium/Give Up)
-            gtag('event', 'attempted_intervention', {
-                'event_category': 'Decision',
-                'scenario_name': event.scenarioName,
-                'intervention_level': choice.intervention_level,
-                'thinking_time_sec': Math.round((Date.now() - scenarioStartTime) / 1000)
-            });
-            
-            stats.trust += choice.trustEffect;
-
-            setTimeout(() => {
-                showTyping(() => {
-                    addKevinMessage(choice.kevinReply, false, choice.mood);
-                    
-                    if (choice.nextStep === 'followup') {
-                        setTimeout(() => promptFollowupChoices(choice.followup_choices, event.scenarioName), 1000);
-                    } else if (choice.nextStep === 'consequence') {
-                        stats.debt += choice.debtEffect;
-                        stats.stress += choice.stressEffect;
-                        setTimeout(() => {
-                            triggerTimeJump(choice.jumpTitle, choice.jumpSub, choice.consequenceMsg, choice.consequenceMood);
-                        }, 2500);
-                    }
-                });
-            }, 600);
-        }
-
-        function promptFollowupChoices(followup_choices, scenarioName) {
-            choicesContainer.innerHTML = '';
-            choiceHeader.innerText = "Kevin is pushing back. Your response:";
-
-            followup_choices.forEach(choice => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-3.5 px-4 rounded-xl border border-gray-200 text-left text-[14px] leading-snug transition shadow-sm';
-                btn.innerText = choice.text;
-                btn.onclick = () => handleFollowupChoice(choice, scenarioName);
-                choicesContainer.appendChild(btn);
-            });
-            
-            choicePanel.classList.remove('hidden');
-            scrollToBottom();
-        }
-
-        function handleFollowupChoice(choice, scenarioName) {
-            choicePanel.classList.add('hidden');
-            addUserMessage(choice.text);
-
-            stats.debt += choice.debtEffect;
-            stats.stress += choice.stressEffect;
-
-            let listened = false;
-            if (choice.isStrict) {
-                listened = (Math.random() * 100) < stats.trust + 20; 
-            }
-
-            // v3.5 NEW: Track if Kevin rejected or listened to the final push
-            if (listened) {
-                gtag('event', 'kevin_listened', {
-                    'scenario_name': scenarioName
-                });
-            } else {
-                gtag('event', 'kevin_rejected_advice', {
-                    'scenario_name': scenarioName
-                });
-            }
-
-            const finalReply = listened ? choice.listenMsg : choice.resistMsg;
-            const replyMood = listened ? 'agree' : 'argue';
-
-            setTimeout(() => {
-                showTyping(() => {
-                    addKevinMessage(finalReply, false, replyMood);
-                    
-                    setTimeout(() => {
-                        let consequenceMood = listened ? 'agree' : 'upset';
-                        triggerTimeJump(choice.jumpTitle, choice.jumpSub, listened ? choice.outcomeListened : choice.outcomeIgnored, consequenceMood);
-                    }, 2500);
-                });
+                const finalBtn = document.createElement('button');
+                finalBtn.className = 'choice-btn';
+                finalBtn.innerText = "Look, just trust me on this. Please.";
+                finalBtn.onclick = () => resolveScenario(choice, scenario);
+                choicesContainer.appendChild(finalBtn);
             }, 800);
-        }
+        }, 1200);
+    }
 
-        function triggerTimeJump(title, subtitle, consequenceText, consequenceMood) {
-            document.getElementById('jump-title').innerText = title;
-            document.getElementById('jump-subtitle').innerText = subtitle;
-            timeJump.classList.remove('hidden');
-            
-            setTimeout(() => {
-                timeJump.classList.add('hidden');
-                setTimeout(() => {
-                    addKevinMessage(consequenceText, false, consequenceMood); 
-                    
-                    setTimeout(() => {
-                        currentStage++;
-                        if(currentStage < storyEvents.length) {
-                            runStage();
-                        } else {
-                            triggerEndingDialogue();
-                        }
-                    }, 3500);
-                }, 1000);
-            }, 3000);
-        }
+    function resolveScenario(choice, scenario) {
+        choicesContainer.innerHTML = '';
+        addMessage("Look, just trust me on this. Please.", 'user');
 
-        function runStage() {
-            gtag('event', 'scenario_reached', {
-                'event_category': 'Progress',
-                'scenario_name': storyEvents[currentStage].scenarioName
-            });
+        // Logic Check: Did he listen? (Much harder now)
+        let totalChance = choice.baseListenChance + (state.trust * 0.01);
+        let roll = Math.random();
+        
+        let listened = roll < totalChance;
 
-            setTimeout(() => {
-                sendMessageSequence(storyEvents[currentStage].setup, 'neutral', () => {
-                    setTimeout(() => promptChoices(currentStage), 500);
-                });
-            }, 1000);
-        }
-
-        function triggerEndingDialogue() {
-            setTimeout(() => {
-                let endingMsg = [];
-                let finalMood = 'neutral';
-
-                if (stats.debt > 25000 || stats.stress > 65) {
-                    currentEndingType = 'ending_crashed';
-                    finalMood = 'upset'; 
-                    endingMsg = [
-                        "Hey man, are you there?",
-                        "I am completely drowning.",
-                        "Everything piled up way faster than I thought. The debt, the bills... I can barely pay the minimums.",
-                        "My credit score is wrecked and I'm totally burnt out. I don't know what to do..."
-                    ];
-                } else if (stats.trust > 55) {
-                    currentEndingType = 'ending_saved';
-                    finalMood = 'agree'; 
-                    endingMsg = [
-                        "Hey!",
-                        "Crazy year. A lot of my friends ended up in massive debt or terrible situations.",
-                        "Honestly, thank God I listened to some of your warnings and slowed down.",
-                        "I might not have everything figured out, but I can sleep peacefully at night."
-                    ];
-                } else {
-                    currentEndingType = 'ending_struggling';
-                    finalMood = 'upset'; 
-                    endingMsg = [
-                        "Hey...",
-                        "Things got really tight this month.",
-                        "Between the payments and high cost of living, I have zero savings left.",
-                        "I'm constantly stressed out. Feels like I'm one mistake away from ruin."
-                    ];
-                }
-
-                sendMessageSequence(endingMsg, finalMood, () => {
-                    setTimeout(() => {
-                        endGame();
-                    }, 2000);
-                });
-            }, 1500);
-        }
-
-        function endGame() {
-            choicePanel.classList.add('hidden');
-            choicesContainer.innerHTML = '';
-
-            let endingHtml = '';
-
-            if (currentEndingType === 'ending_crashed') {
-                endingHtml = `
-                    <div class="text-center space-y-4">
-                        <div class="text-6xl mb-4">💀</div>
-                        <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin Crashed.</div>
-                        <div class="text-gray-500 text-sm leading-relaxed">
-                            He completely ran out of cash flow.<br>He has zero financial resilience left.<br>And he's ghosting everyone's texts.
-                        </div>
-                    </div>
-                `;
-            } else if (currentEndingType === 'ending_saved') {
-                endingHtml = `
-                    <div class="text-center space-y-4">
-                        <div class="text-6xl mb-4">🛟</div>
-                        <div class="text-2xl font-black text-gray-800 tracking-tight">You Saved Him.</div>
-                        <div class="text-gray-500 text-sm leading-relaxed">
-                            Kevin still has impulsive urges.<br>But he officially trusts you enough to ask for advice before making big life moves.
-                        </div>
-                    </div>
-                `;
+        setTimeout(() => {
+            if (listened) {
+                gtag('event', 'kevin_listened');
+                addMessage("...fine. Whatever. I'll hold off.", 'kevin');
+                applyConsequences(scenario.consequence.listened);
             } else {
-                endingHtml = `
-                    <div class="text-center space-y-4">
-                        <div class="text-6xl mb-4">😶</div>
-                        <div class="text-2xl font-black text-gray-800 tracking-tight">Kevin is Surviving.</div>
-                        <div class="text-gray-500 text-sm leading-relaxed">
-                            His life isn't totally destroyed,<br>but he's living paycheck to paycheck and hasn't truly grown up yet.
-                        </div>
-                    </div>
-                `;
+                gtag('event', 'kevin_rejected_advice');
+                addMessage("I hear you, but you're wrong. I'm doing it.", 'kevin');
+                applyConsequences(scenario.consequence.ignored);
             }
+        }, 1500);
+    }
 
-            // v3.5 NEW: Clean 'ending_reached' event with parameter
-            gtag('event', 'ending_reached', {
-                'event_category': 'Completion',
-                'ending_type': currentEndingType,
-                'final_debt': stats.debt,
-                'final_stress': stats.stress,
-                'final_trust': stats.trust
-            });
-
-            const result = document.createElement('div');
-            result.className = 'bg-white rounded-3xl p-6 slide-up shadow-xl mt-4 mb-6 border border-gray-100 mx-2 relative z-40';
+    function applyConsequences(result) {
+        setTimeout(() => {
+            state.debt += result.debt;
+            state.stress += result.stress;
+            if (result.trust) state.trust += result.trust;
+            if (result.cryptoLossFlag) state.cryptoLost = true; // Set memory flag
             
-            const formattedDebt = new Intl.NumberFormat('en-US').format(stats.debt);
+            updateUI();
+            addMessage(`* ${result.text} *`, 'system');
+            
+            state.currentScenario++;
+            setTimeout(loadScenario, 2500);
+        }, 1500);
+    }
 
-            result.innerHTML = `
-                ${endingHtml}
-                <div class="mt-8 bg-gray-50 rounded-2xl p-4 text-[13px] space-y-3 font-medium text-gray-600 border border-gray-100">
-                    <div class="flex justify-between items-center">
-                        <span>💸 Final Debt</span>
-                        <span class="text-red-500 font-bold text-base">$${formattedDebt}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span>😵 Stress Level</span>
-                        <span class="text-gray-800 font-bold">${stats.stress}/100</span>
-                    </div>
-                </div>
-
-                <button onclick="handleReplay()"
-                    class="mt-6 w-full bg-slate-900 text-white rounded-xl py-4 font-bold hover:bg-slate-800 transition shadow-lg active:scale-95">
-                    🔄 Replay Kevin's Life
-                </button>
-            `;
-
+    function endGame() {
+        gtag('event', 'ending_reached', { final_debt: state.debt, final_stress: state.stress });
+        choicesContainer.innerHTML = '';
+        
+        setTimeout(() => {
+            if (state.debt === 0) {
+                addMessage("Okay... honestly, thank you. If you hadn't stopped me, I would have ruined my life. I owe you.", 'kevin');
+            } else {
+                // The Guilt Trip Ending to drive Rage Replays
+                addMessage("You were right, okay? Are you happy now? I have massive debt, my credit is ruined, and I have to move back in with my parents. I wish you had tried harder to stop me. Don't text me.", 'kevin');
+            }
+            
             setTimeout(() => {
-                chatBox.appendChild(result);
-                scrollToBottom();
+                const replayBtn = document.createElement('button');
+                replayBtn.className = 'replay-btn';
+                replayBtn.innerText = "Try to Save Him Again";
+                replayBtn.onclick = () => {
+                    gtag('event', 'rage_replay');
+                    location.reload();
+                };
+                choicesContainer.appendChild(replayBtn);
             }, 1000);
-        }
-
-        function handleReplay() {
-            // v3.5 NEW: Rage Replay Event
-            gtag('event', 'rage_replay', { 
-                'event_category': 'Engagement',
-                'replayed_from': currentEndingType
-            });
-            setTimeout(() => { location.reload(); }, 250);
-        }
-
-        window.onload = () => {
-            gtag('event', 'game_start', { 'event_category': 'Engagement' });
-            runStage();
-        };
-    </script>
+        }, 1000);
+    }
+</script>
 </body>
 </html>
